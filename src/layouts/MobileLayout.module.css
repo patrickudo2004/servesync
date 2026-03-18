@@ -1,0 +1,66 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding-bottom: 80px; /* Space for bottom nav */
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
+  height: 64px;
+}
+
+.churchInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.churchName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.userName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  background-color: #8b5cf6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.content {
+  flex: 1;
+  padding: 1.25rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .container {
+    display: none; /* Hidden on desktop */
+  }
+}

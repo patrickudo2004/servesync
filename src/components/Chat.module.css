@@ -1,0 +1,285 @@
+.chatContainer {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 144px); /* Adjust for header and bottom nav */
+  background-color: #f0f2f5;
+  position: relative;
+}
+
+.channelHeader {
+  padding: 1rem;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.channelInfo h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.channelInfo p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.messageList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.inputArea {
+  padding: 0.75rem 1rem;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+}
+
+.inputWrapper {
+  flex: 1;
+  background: #f3f4f6;
+  border-radius: 24px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inputWrapper textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  resize: none;
+  padding: 0.25rem 0;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  max-height: 120px;
+  outline: none;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.iconBtn:hover {
+  color: #8b5cf6;
+}
+
+.sendBtn {
+  background: #8b5cf6;
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.sendBtn:hover {
+  background: #7c3aed;
+  transform: scale(1.05);
+}
+
+.sendBtn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* Message Bubble Styles */
+.bubbleWrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+}
+
+.bubbleWrapper.own {
+  align-self: flex-end;
+}
+
+.bubble {
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.bubbleWrapper.own .bubble {
+  background-color: #dcf8c6;
+  border-top-right-radius: 2px;
+}
+
+.bubbleWrapper:not(.own) .bubble {
+  background-color: white;
+  border-top-left-radius: 2px;
+}
+
+.authorName {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.messageText {
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.messageTime {
+  font-size: 0.625rem;
+  color: #6b7280;
+  align-self: flex-end;
+  margin-top: 2px;
+}
+
+/* File Preview Styles */
+.filePreview {
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.imagePreview {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+}
+
+.genericFile {
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.fileIcon {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b5cf6;
+}
+
+.fileInfo {
+  flex: 1;
+  overflow: hidden;
+}
+
+.fileName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileSize {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Uploader Styles */
+.uploadProgress {
+  position: absolute;
+  bottom: 80px;
+  left: 1rem;
+  right: 1rem;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 20;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: #8b5cf6;
+  transition: width 0.3s;
+}
+
+.channelList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.channelItem {
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.channelItem:hover {
+  background: #f9fafb;
+}
+
+.channelIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+}
+
+.channelItem.active {
+  border-color: #8b5cf6;
+  background: #f5f3ff;
+}

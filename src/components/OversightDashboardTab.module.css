@@ -1,0 +1,171 @@
+.container {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  color: #15803d;
+}
+
+.header h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.headerIcon {
+  color: #15803d;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.metricCard {
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.metricIcon {
+  margin-bottom: 0.5rem;
+}
+
+.metricValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.metricLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.escalationSection {
+  margin-bottom: 2rem;
+}
+
+.escalationSection h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.actionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f1f5f9;
+  border-radius: 12px;
+}
+
+.actionInfo h4 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.actionInfo p {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.escalateBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #15803d;
+  color: white;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.escalateBtn:hover {
+  background: #166534;
+}
+
+.escalateBtn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.summarySection h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+
+.moraleIndicator {
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.warning {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #92400e;
+  background: #fffbeb;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.success {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #15803d;
+  background: #f0fdf4;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+  font-weight: 600;
+}

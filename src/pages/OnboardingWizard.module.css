@@ -1,0 +1,170 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  padding: 1rem;
+}
+
+.wizardCard {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  padding: 3rem 2rem;
+  border-radius: 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.progress {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 3rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  transition: all 0.3s;
+}
+
+.dot.active {
+  background: #8b5cf6;
+  width: 24px;
+  border-radius: 4px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.iconCircle {
+  width: 80px;
+  height: 80px;
+  background: #f5f3ff;
+  color: #8b5cf6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.step h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.step p {
+  color: #6b7280;
+  margin-bottom: 2.5rem;
+  line-height: 1.5;
+}
+
+.uploadArea {
+  margin-bottom: 3rem;
+}
+
+.uploadBtn {
+  background: #8b5cf6;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.preview img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border: 4px solid #f5f3ff;
+}
+
+.changeBtn {
+  display: block;
+  color: #8b5cf6;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.inputGroup {
+  width: 100%;
+  margin-bottom: 3rem;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  text-align: center;
+}
+
+.availabilityGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 3rem;
+}
+
+.dayBtn {
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+}
+
+.nextBtn, .finishBtn {
+  width: 100%;
+  background: #111827;
+  color: white;
+  padding: 1rem;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nextBtn:hover, .finishBtn:hover {
+  background: #000;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

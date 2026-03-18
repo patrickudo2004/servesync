@@ -1,0 +1,158 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  padding: 1.5rem;
+}
+
+.card {
+  background: white;
+  padding: 3rem;
+  border-radius: 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 520px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.iconBox {
+  width: 64px;
+  height: 64px;
+  background: #f5f3ff;
+  color: #8b5cf6;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.header h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: #6b7280;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.field input {
+  padding: 0.875rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+.slugInput {
+  display: flex;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding-left: 1rem;
+  overflow: hidden;
+}
+
+.slugInput span {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+.slugInput input {
+  border: none;
+  background: transparent;
+  flex: 1;
+  padding-left: 0.25rem;
+}
+
+.inputWithIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWithIcon svg {
+  position: absolute;
+  left: 1rem;
+  color: #9ca3af;
+}
+
+.inputWithIcon input {
+  padding-left: 2.75rem;
+}
+
+.uploadBtn {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px dashed #e5e7eb;
+}
+
+.submitBtn {
+  margin-top: 1rem;
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submitBtn:hover {
+  background: #7c3aed;
+  transform: translateY(-1px);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

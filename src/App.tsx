@@ -1,0 +1,137 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
+import { ConvexReactClient, Authenticated, Unauthenticated, AuthLoading } from "convex/react";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+import { Dashboard } from './pages/Dashboard';
+import { Rota } from './pages/Rota';
+import { TimeOff } from './pages/TimeOff';
+import { Login } from './pages/Login';
+import { CreateChurch } from './pages/CreateChurch';
+import { OnboardingWizard } from './pages/OnboardingWizard';
+import { InviteManagement } from './pages/InviteManagement';
+import { AttendancePage } from './pages/AttendancePage';
+import { ChatPage } from './pages/ChatPage';
+import { MarketplacePage } from './pages/MarketplacePage';
+import { HallOfFamePage } from './pages/HallOfFamePage';
+import { ProfilePage } from './pages/ProfilePage';
+import { Layout } from './components/Layout';
+import { MobileLayout } from './layouts/MobileLayout';
+import { useMediaQuery } from './hooks/useMediaQuery';
+
+// Mobile Pages
+import { VolunteerHome } from './pages/mobile/VolunteerHome';
+import { SubunitLeadHome } from './pages/mobile/SubunitLeadHome';
+import { DeptHeadHome } from './pages/mobile/DeptHeadHome';
+import { SuperAdminHome } from './pages/mobile/SuperAdminHome';
+
+import { ThemeProvider } from './contexts/ThemeContext';
+
+// Convex Client
+const CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
+const convex = new ConvexReactClient(CONVEX_URL || "https://placeholder.convex.cloud");
+const queryClient = new QueryClient();
+
+function AppContent() {
+  const me = useQuery(api.users.me);
+  const isMobile = useMediaQuery('(max-width: 1024px)');
+
+  if (me && !me.onboardingCompleted) {
+    return <OnboardingWizard />;
+  }
+
+  const PageLayout = isMobile ? MobileLayout : Layout;
+
+  const getMobileHome = () => {
+    switch (me?.role) {
+      case 'SuperAdmin': return <SuperAdminHome />;
+      case 'DepartmentHead': return <DeptHeadHome />;
+      case 'SubunitLead': return <SubunitLeadHome />;
+      default: return <VolunteerHome />;
+    }
+  };
+
+  return (
+    <Routes>
+      <Route path="/" element={
+        <PageLayout user={me as any}>
+          {isMobile ? getMobileHome() : <Dashboard userRole={me?.role as any} />}
+        </PageLayout>
+      } />
+      <Route path="/attendance" element={
+        <PageLayout user={me as any}>
+          <AttendancePage />
+        </PageLayout>
+      } />
+      <Route path="/rota" element={
+        <PageLayout user={me as any}>
+          <Rota />
+        </PageLayout>
+      } />
+      <Route path="/time-off" element={
+        <PageLayout user={me as any}>
+          <TimeOff />
+        </PageLayout>
+      } />
+      <Route path="/invites" element={
+        <PageLayout user={me as any}>
+          <InviteManagement />
+        </PageLayout>
+      } />
+      <Route path="/chat" element={
+        <PageLayout user={me as any}>
+          <ChatPage />
+        </PageLayout>
+      } />
+      <Route path="/marketplace" element={
+        <PageLayout user={me as any}>
+          <MarketplacePage />
+        </PageLayout>
+      } />
+      <Route path="/hall-of-fame" element={
+        <PageLayout user={me as any}>
+          <HallOfFamePage />
+        </PageLayout>
+      } />
+      <Route path="/profile" element={
+        <PageLayout user={me as any}>
+          <ProfilePage />
+        </PageLayout>
+      } />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <ConvexAuthProvider client={convex}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <BrowserRouter>
+            <AuthLoading>
+              <div className="h-screen flex items-center justify-center bg-gray-50">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+              </div>
+            </AuthLoading>
+            
+            <Unauthenticated>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/create-church" element={<CreateChurch />} />
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </Routes>
+            </Unauthenticated>
+
+            <Authenticated>
+              <AppContent />
+            </Authenticated>
+          </BrowserRouter>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ConvexAuthProvider>
+  );
+}

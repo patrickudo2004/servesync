@@ -1,0 +1,208 @@
+.offerContainer {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+.offerHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.offerHeader h3 {
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.swapIcon {
+  color: #3b82f6;
+}
+
+.offerDescription {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+  font-size: 0.875rem;
+  resize: none;
+  outline: none;
+}
+
+.textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.submitButton {
+  background: #3b82f6;
+  color: white;
+  font-weight: 700;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submitButton:hover {
+  background: #2563eb;
+}
+
+.submitButton:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Marketplace */
+.marketplaceContainer {
+  padding: 1rem;
+}
+
+.marketHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.marketHeader h2 {
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.marketIcon {
+  color: #10b981;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.swapList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.swapCard {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.swapMain {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.serviceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.serviceName {
+  font-weight: 700;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.requesterInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1e293b;
+  background: #f1f5f9;
+  padding: 0.4rem 0.75rem;
+  border-radius: 99px;
+}
+
+.roleTag {
+  color: #3b82f6;
+  font-size: 0.75rem;
+}
+
+.noteBox {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8125rem;
+  color: #92400e;
+  margin-bottom: 1rem;
+}
+
+.claimButton {
+  width: 100%;
+  background: #10b981;
+  color: white;
+  font-weight: 700;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.claimButton:hover {
+  background: #059669;
+}
+
+.claimButton:disabled {
+  background: #94a3b8;
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+  font-weight: 600;
+}

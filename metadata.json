@@ -1,0 +1,8 @@
+{
+  "name": "ServeSync",
+  "description": "Real-time volunteer management for churches with QR attendance and geofencing.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "ServeSync",
+  "short_name": "ServeSync",
+  "description": "Church Volunteer Management & Attendance System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8b5cf6",
+  "icons": [
+    {
+      "src": "https://picsum.photos/seed/servesync/192/192",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://picsum.photos/seed/servesync/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
