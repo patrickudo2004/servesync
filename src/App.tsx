@@ -18,6 +18,7 @@ import { ChatPage } from './pages/ChatPage';
 import { MarketplacePage } from './pages/MarketplacePage';
 import { HallOfFamePage } from './pages/HallOfFamePage';
 import { ProfilePage } from './pages/ProfilePage';
+import { DebugAuth } from './pages/DebugAuth';
 import { Layout } from './components/Layout';
 import { MobileLayout } from './layouts/MobileLayout';
 import { useMediaQuery } from './hooks/useMediaQuery';
@@ -101,6 +102,7 @@ function AppContent() {
           <ProfilePage />
         </PageLayout>
       } />
+      <Route path="/debug-auth" element={<DebugAuth />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -122,6 +124,7 @@ export default function App() {
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/create-church" element={<CreateChurch />} />
+                <Route path="/debug-auth" element={<DebugAuth />} />
                 <Route path="*" element={<Navigate to="/login" replace />} />
               </Routes>
             </Unauthenticated>
