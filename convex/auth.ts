@@ -2,7 +2,7 @@ import Google from "@auth/core/providers/google";
 import { Email } from "@convex-dev/auth/providers/Email";
 import { convexAuth } from "@convex-dev/auth/server";
 
-export const { auth, signIn, signOut } = convexAuth({
+export const { auth, signIn, signOut, store } = convexAuth({
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
