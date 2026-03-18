@@ -32,11 +32,13 @@ import { ThemeProvider } from './contexts/ThemeContext';
 
 // Convex Client
 const CONVEX_URL = import.meta.env.VITE_CONVEX_URL;
-const convex = new ConvexReactClient(CONVEX_URL || "https://placeholder.convex.cloud");
+console.log("[DEBUG] CONVEX_URL from env:", CONVEX_URL);
+const convex = new ConvexReactClient(CONVEX_URL);
 const queryClient = new QueryClient();
 
 function AppContent() {
   const me = useQuery(api.users.me);
+  console.log("[DEBUG] Current user (me):", me);
   const isMobile = useMediaQuery('(max-width: 1024px)');
 
   if (me && !me.onboardingCompleted) {

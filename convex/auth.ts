@@ -17,18 +17,4 @@ export const { auth, signIn, signOut, store } = convexAuth({
       },
     }),
   ],
-  callbacks: {
-    async createOrUpdateUser(ctx, args) {
-      if (args.existingUserId) {
-        return args.existingUserId;
-      }
-      return ctx.db.insert("users", {
-        email: args.profile.email,
-        name: args.profile.name,
-        image: args.profile.picture || args.profile.image,
-        role: "Volunteer",
-        onboardingCompleted: false,
-      });
-    },
-  },
 });

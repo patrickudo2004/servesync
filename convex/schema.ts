@@ -10,6 +10,9 @@ export default defineSchema({
     email: v.optional(v.string()),
     image: v.optional(v.string()),
     phone: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    phoneVerificationTime: v.optional(v.number()),
+    isAnonymous: v.optional(v.boolean()),
     churchId: v.optional(v.id("churches")),
     role: v.optional(v.union(
       v.literal("Volunteer"),
