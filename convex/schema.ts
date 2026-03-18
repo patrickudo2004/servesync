@@ -11,7 +11,7 @@ export default defineSchema({
     image: v.optional(v.string()),
     phone: v.optional(v.string()),
     churchId: v.optional(v.id("churches")),
-    role: v.union(
+    role: v.optional(v.union(
       v.literal("Volunteer"),
       v.literal("SubunitLead"),
       v.literal("DepartmentHead"),
@@ -19,11 +19,11 @@ export default defineSchema({
       v.literal("Probation"),
       v.literal("OnNotice"),
       v.literal("SuperAdmin")
-    ),
+    )),
     department: v.optional(v.string()),
     subunit: v.optional(v.string()),
     availability: v.optional(v.any()), // JSON blob for 4-week calendar
-    onboardingCompleted: v.boolean(),
+    onboardingCompleted: v.optional(v.boolean()),
     skills: v.optional(v.array(v.string())),
     additionalSubunits: v.optional(v.array(v.string())),
     isExtendedProbation: v.optional(v.boolean()),
