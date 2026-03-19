@@ -18,6 +18,7 @@ import type * as invites from "../invites.js";
 import type * as oversight from "../oversight.js";
 import type * as probation from "../probation.js";
 import type * as recognition from "../recognition.js";
+import type * as rewards from "../rewards.js";
 import type * as rotas from "../rotas.js";
 import type * as services from "../services.js";
 import type * as shiftSwap from "../shiftSwap.js";
@@ -41,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   oversight: typeof oversight;
   probation: typeof probation;
   recognition: typeof recognition;
+  rewards: typeof rewards;
   rotas: typeof rotas;
   services: typeof services;
   shiftSwap: typeof shiftSwap;
