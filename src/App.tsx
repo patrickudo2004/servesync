@@ -40,7 +40,20 @@ function AppContent() {
   const me = useQuery(api.users.me);
   const isMobile = useMediaQuery('(max-width: 1024px)');
 
+  if (me === undefined) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
   if (me && !me.onboardingCompleted) {
+    return <OnboardingWizard />;
+  }
+
+  if (!me) {
+    // If authenticated but no user record, force onboarding
     return <OnboardingWizard />;
   }
 
@@ -58,8 +71,8 @@ function AppContent() {
   return (
     <Routes>
       <Route path="/" element={
-        <PageLayout user={me as any}>
-          {isMobile ? getMobileHome() : <Dashboard userRole={me?.role as any} />}
+        <PageLayout user={me}>
+          {isMobile ? getMobileHome() : <Dashboard userRole={me.role as any} />}
         </PageLayout>
       } />
       <Route path="/attendance" element={
