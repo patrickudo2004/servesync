@@ -19,7 +19,9 @@ import type * as oversight from "../oversight.js";
 import type * as probation from "../probation.js";
 import type * as recognition from "../recognition.js";
 import type * as rotas from "../rotas.js";
+import type * as services from "../services.js";
 import type * as shiftSwap from "../shiftSwap.js";
+import type * as subunits from "../subunits.js";
 import type * as users from "../users.js";
 
 import type {
@@ -40,7 +42,9 @@ declare const fullApi: ApiFromModules<{
   probation: typeof probation;
   recognition: typeof recognition;
   rotas: typeof rotas;
+  services: typeof services;
   shiftSwap: typeof shiftSwap;
+  subunits: typeof subunits;
   users: typeof users;
 }>;
 
