@@ -48,12 +48,12 @@ function AppContent() {
     );
   }
 
-  if (me && !me.onboardingCompleted) {
-    return <OnboardingWizard />;
+  // Phase 1: If user has no church, they must create or join one
+  if (!me || !me.churchId) {
+    return <CreateChurch />;
   }
 
-  if (!me) {
-    // If authenticated but no user record, force onboarding
+  if (!me.onboardingCompleted) {
     return <OnboardingWizard />;
   }
 

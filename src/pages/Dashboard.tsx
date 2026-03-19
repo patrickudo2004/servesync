@@ -26,49 +26,7 @@ import { UserRole } from '../components/RoleBadge';
 import { OversightDashboardTab } from '../components/OversightDashboardTab';
 import styles from './Dashboard.module.css';
 
-// Mock data for demonstration
-const ATTENDANCE_DATA = [
-  { name: 'Jan', value: 400 },
-  { name: 'Feb', value: 300 },
-  { name: 'Mar', value: 600 },
-  { name: 'Apr', value: 800 },
-  { name: 'May', value: 500 },
-  { name: 'Jun', value: 900 },
-];
-
-const ORG_DATA: OrgNode = {
-  id: '1',
-  name: 'Senior Pastor',
-  role: 'SuperAdmin',
-  children: [
-    {
-      id: 'oversight-1',
-      name: 'Pastor Mike',
-      role: 'PastoralOversight',
-      children: [
-        {
-          id: '2',
-          name: 'John Doe',
-          role: 'DepartmentHead',
-          children: [
-            { id: '3', name: 'Jane Smith', role: 'SubunitLead', children: [
-              { id: '4', name: 'Alice Johnson', role: 'Volunteer' },
-              { id: '5', name: 'Bob Wilson', role: 'Probation' },
-            ]},
-          ]
-        },
-        {
-          id: '6',
-          name: 'Sarah Parker',
-          role: 'DepartmentHead',
-          children: [
-            { id: '7', name: 'Mike Ross', role: 'SubunitLead' },
-          ]
-        }
-      ]
-    }
-  ]
-};
+// Statistics and Organization data will be fetched from Convex
 
 interface DashboardProps {
   userRole: UserRole;
@@ -140,15 +98,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
             <h2>Attendance Trends</h2>
           </div>
           <div className={styles.chartContainer}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={ATTENDANCE_DATA}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="flex items-center justify-center h-[300px] text-gray-400 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+              No attendance records found for this church.
+            </div>
           </div>
         </div>
 
@@ -159,7 +111,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
               <Users size={20} />
               <h2>Organization Structure</h2>
             </div>
-            <Organogram data={ORG_DATA} />
+            <div className="flex items-center justify-center p-12 text-gray-400 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+              Set up your departments and subunits to view the organogram.
+            </div>
           </div>
         )}
 
