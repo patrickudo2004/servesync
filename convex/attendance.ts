@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { auth } from "./auth";
 import { checkMilestonesInternal } from "./recognition";
 
 // Helper for geofence distance calculation (Haversine formula)
@@ -25,10 +26,11 @@ export const markAttendance = mutation({
     lat: v.number(),
     lng: v.number(),
     accuracy: v.number(),
-    userId: v.id("users"),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db.get(args.userId);
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
 
     const service = await ctx.db.get(args.serviceId);
@@ -44,28 +46,30 @@ export const markAttendance = mutation({
 
     // 2. Verify Time Window (e.g. 30 mins before start to 30 mins after end)
     const now = Date.now();
-    const windowMs = (church.settings.attendanceWindowMinutes || 30) * 60 * 1000;
+    const windowMs = (church.settings?.attendanceWindowMinutes || 30) * 60 * 1000;
     if (now < service.startTime - windowMs || now > service.endTime + windowMs) {
       throw new Error("Attendance window is closed");
     }
 
     // 3. Verify Geofence
-    const distance = calculateDistance(
-      args.lat,
-      args.lng,
-      church.location.lat,
-      church.location.lng
-    );
+    if (church.location) {
+      const distance = calculateDistance(
+        args.lat,
+        args.lng,
+        church.location.lat,
+        church.location.lng
+      );
 
-    if (distance > (church.settings.geofenceRadius || 100)) {
-      throw new Error(`You are too far from the church (${Math.round(distance)}m away)`);
+      if (distance > (church.settings?.geofenceRadius || 100)) {
+        throw new Error(`You are too far from the church (${Math.round(distance)}m away)`);
+      }
     }
 
     // 4. Check if already marked
     const existing = await ctx.db
       .query("attendance")
       .withIndex("by_service", (q) => q.eq("serviceId", args.serviceId))
-      .filter((q) => q.eq(q.field("userId"), args.userId))
+      .filter((q) => q.eq(q.field("userId"), userId))
       .first();
 
     if (existing) {
@@ -77,11 +81,11 @@ export const markAttendance = mutation({
 
     const attendanceId = await ctx.db.insert("attendance", {
       serviceId: args.serviceId,
-      userId: args.userId,
+      userId: userId,
       churchId: user.churchId,
       timestamp: now,
       method: "QR",
-      markedById: args.userId,
+      markedById: userId,
       location: {
         lat: args.lat,
         lng: args.lng,
@@ -90,7 +94,7 @@ export const markAttendance = mutation({
       status,
     });
 
-    await checkMilestonesInternal(ctx, args.userId);
+    await checkMilestonesInternal(ctx, userId);
 
     return attendanceId;
   },

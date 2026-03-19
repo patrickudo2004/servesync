@@ -1,56 +1,87 @@
 import React from 'react';
-import { Users, CheckCircle2, Clock, QrCode, MessageSquare } from 'lucide-react';
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { Users, QrCode, MessageSquare, Loader2, MapPin } from 'lucide-react';
+import { format } from 'date-fns';
 import styles from './mobile.module.css';
 
 export const SubunitLeadHome: React.FC = () => {
+  const me = useQuery(api.users.me);
+  const nextService = useQuery(api.services.getNextService);
+  const subunits = useQuery(api.subunits.getSubunits);
+  
+  // Find the subunit this user leads (for demo assuming they have one assigned)
+  const mySubunitId = me?.subunit;
+  
+  const liveAttendance = useQuery(
+    api.subunits.getLiveAttendance, 
+    nextService && mySubunitId ? { serviceId: nextService._id, subunitId: mySubunitId } : "skip"
+  );
+
+  if (me === undefined || nextService === undefined || liveAttendance === undefined) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="animate-spin text-purple-600" size={32} />
+      </div>
+    );
+  }
+
+  const presentCount = liveAttendance?.length || 0;
+
   return (
     <div className={styles.page}>
       <div className={styles.grid}>
         <div className={styles.card + ' ' + styles.statCard}>
-          <span className={styles.statValue}>12 / 15</span>
+          <span className={styles.statValue}>{presentCount}</span>
           <span className={styles.statLabel}>Checked In</span>
         </div>
         <div className={styles.card + ' ' + styles.statCard}>
-          <span className={styles.statValue}>80%</span>
-          <span className={styles.statLabel}>Attendance</span>
+          <span className={styles.statValue}>{nextService?.name || 'No Service'}</span>
+          <span className={styles.statLabel}>Current Service</span>
         </div>
       </div>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Live Service Mode</h2>
-          <div className={styles.badge} style={{ background: '#fef2f2', color: '#ef4444' }}>Live</div>
+          <h2 className={styles.sectionTitle}>Team Live Attendance</h2>
+          {nextService && <div className={styles.badge} style={{ background: '#fef2f2', color: '#ef4444' }}>Live</div>}
         </div>
         <div className={styles.list}>
-          {[
-            { name: 'John Doe', status: 'Present', time: '08:45 AM', color: '#22c55e' },
-            { name: 'Jane Smith', status: 'Present', time: '08:50 AM', color: '#22c55e' },
-            { name: 'Mike Ross', status: 'Late', time: '09:05 AM', color: '#f59e0b' },
-            { name: 'Sarah Connor', status: 'Absent', time: '-', color: '#ef4444' },
-          ].map((member, i) => (
-            <div key={i} className={styles.listItem}>
-              <div className={styles.avatar} style={{ width: 32, height: 32, fontSize: '0.75rem' }}>
-                {member.name[0]}
-              </div>
-              <div className={styles.itemInfo}>
-                <p className={styles.itemTitle}>{member.name}</p>
-                <p className={styles.itemSubtitle}>{member.status} {member.time !== '-' && `• ${member.time}`}</p>
-              </div>
-              <div className={styles.badge} style={{ color: member.color, border: `1px solid ${member.color}` }}>
-                {member.status}
-              </div>
+          {!liveAttendance || liveAttendance.length === 0 ? (
+            <div className="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-gray-400">
+              No one has checked in yet.
             </div>
-          ))}
+          ) : (
+            liveAttendance.map((record: any) => (
+              <div key={record._id} className={styles.listItem}>
+                <div className={styles.avatar} style={{ width: 32, height: 32, fontSize: '0.75rem' }}>
+                  {record.user?.name?.[0] || '?'}
+                </div>
+                <div className={styles.itemInfo}>
+                  <p className={styles.itemTitle}>{record.user?.name || 'Unknown User'}</p>
+                  <p className={styles.itemSubtitle}>
+                    {record.status} • {format(record.timestamp, 'p')}
+                  </p>
+                </div>
+                <div className={styles.badge} style={{ 
+                  color: record.status === 'Present' ? '#22c55e' : '#f59e0b', 
+                  border: `1px solid ${record.status === 'Present' ? '#22c55e' : '#f59e0b'}` 
+                }}>
+                  {record.status}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
 
       <section className={styles.section}>
         <div className={styles.card}>
           <div className={styles.sectionHeader}>
-            <h3 className={styles.itemTitle}>Team Chat</h3>
+            <h3 className={styles.itemTitle}>Subunit Chat</h3>
             <MessageSquare size={18} color="#8b5cf6" />
           </div>
-          <p className={styles.itemSubtitle}>3 new messages in Media Team</p>
+          <p className={styles.itemSubtitle}>Internal team coordination</p>
         </div>
       </section>
 

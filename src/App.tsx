@@ -18,6 +18,7 @@ import { ChatPage } from './pages/ChatPage';
 import { MarketplacePage } from './pages/MarketplacePage';
 import { HallOfFamePage } from './pages/HallOfFamePage';
 import { ProfilePage } from './pages/ProfilePage';
+import { AdminPage } from './pages/AdminPage';
 import { DebugAuth } from './pages/DebugAuth';
 import { Layout } from './components/Layout';
 import { MobileLayout } from './layouts/MobileLayout';
@@ -98,6 +99,11 @@ function AppContent() {
       <Route path="/chat" element={
         <PageLayout user={me as any}>
           <ChatPage />
+        </PageLayout>
+      } />
+      <Route path="/admin" element={
+        <PageLayout user={me as any}>
+          <AdminPage />
         </PageLayout>
       } />
       <Route path="/marketplace" element={

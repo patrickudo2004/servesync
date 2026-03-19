@@ -1,38 +1,64 @@
 import React from 'react';
-import { Calendar, Clock, MapPin, QrCode } from 'lucide-react';
+import { useQuery } from "convex/react";
+import { api } from "../../../convex/_generated/api";
+import { Calendar, MapPin, QrCode, Loader2 } from 'lucide-react';
+import { format, formatDistanceToNow } from 'date-fns';
 import styles from './mobile.module.css';
 
 export const VolunteerHome: React.FC = () => {
+  const nextService = useQuery(api.services.getNextService);
+  const myShifts = useQuery(api.rotas.getMyShifts);
+
+  if (nextService === undefined || myShifts === undefined) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="animate-spin text-purple-600" size={32} />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       <section className={styles.section}>
         <div className={styles.card + ' ' + styles.countdownCard}>
           <span className={styles.countdownLabel}>Next Service In</span>
-          <span className={styles.countdownValue}>02:14:35</span>
-          <span className={styles.countdownLabel}>Sunday Morning Service</span>
+          <span className={styles.countdownValue}>
+            {nextService ? formatDistanceToNow(nextService.startTime) : 'No upcoming services'}
+          </span>
+          <span className={styles.countdownLabel}>{nextService?.name || '---'}</span>
         </div>
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Upcoming Shifts</h2>
-          <button className={styles.linkBtn}>View All</button>
         </div>
         <div className={styles.list}>
-          {[1, 2].map((i) => (
-            <div key={i} className={styles.listItem}>
-              <div className={styles.itemIcon}>
-                <Calendar size={20} />
-              </div>
-              <div className={styles.itemInfo}>
-                <p className={styles.itemTitle}>Media Team - Camera 1</p>
-                <p className={styles.itemSubtitle}>Sun, 15 Mar • 09:00 AM</p>
-              </div>
-              <div className={styles.badge} style={{ background: '#dcfce7', color: '#15803d' }}>
-                Confirmed
-              </div>
+          {myShifts.length === 0 ? (
+            <div className="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-gray-400">
+              No upcoming shifts assigned.
             </div>
-          ))}
+          ) : (
+            myShifts.map((shift: any) => (
+              <div key={shift._id} className={styles.listItem}>
+                <div className={styles.itemIcon}>
+                  <Calendar size={20} />
+                </div>
+                <div className={styles.itemInfo}>
+                  <p className={styles.itemTitle}>{shift.subunit?.name || 'Department'} - {shift.role}</p>
+                  <p className={styles.itemSubtitle}>
+                    {shift.service ? format(shift.service.startTime, 'EEE, d MMM • p') : 'TBD'}
+                  </p>
+                </div>
+                <div className={styles.badge} style={{ 
+                  background: shift.status === 'Confirmed' ? '#dcfce7' : '#fee2e2', 
+                  color: shift.status === 'Confirmed' ? '#15803d' : '#991b1b' 
+                }}>
+                  {shift.status}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
 

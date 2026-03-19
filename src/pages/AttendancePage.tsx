@@ -11,13 +11,20 @@ export const AttendancePage: React.FC = () => {
   const handleScan = async (data: string, location: GeolocationPosition) => {
     setIsProcessing(true);
     try {
-      // The QR code data should contain the serviceId
-      // For demo, we'll assume the data is the serviceId
+      let qrData;
+      try {
+        qrData = JSON.parse(data);
+      } catch (e) {
+        // Fallback for simple demo IDs if needed, but PRD expects secret
+        qrData = { serviceId: data, secret: "DEMO_SECRET" };
+      }
+
       await markAttendance({
-        serviceId: data as any,
+        serviceId: qrData.serviceId as any,
+        qrSecret: qrData.secret,
         lat: location.coords.latitude,
         lng: location.coords.longitude,
-        verificationCode: "DEMO_CODE" // In real app, this would be part of the QR
+        accuracy: location.coords.accuracy,
       });
     } finally {
       setIsProcessing(false);

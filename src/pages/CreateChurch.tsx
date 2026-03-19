@@ -16,7 +16,7 @@ export const CreateChurch: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const autoCompleteRef = React.useRef<google.maps.places.Autocomplete | null>(null);
+  const autoCompleteRef = React.useRef<any>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
