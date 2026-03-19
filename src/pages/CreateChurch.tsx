@@ -11,9 +11,33 @@ export const CreateChurch: React.FC = () => {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [address, setAddress] = useState('');
+  const [location, setLocation] = useState<{ lat: number; lng: number } | undefined>();
   const [logoStorageId, setLogoStorageId] = useState<string | undefined>();
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const autoCompleteRef = React.useRef<google.maps.places.Autocomplete | null>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (window.google && inputRef.current && !autoCompleteRef.current) {
+      autoCompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+        fields: ["address_components", "geometry", "name"],
+        types: ["address"],
+      });
+
+      autoCompleteRef.current.addListener("place_changed", () => {
+        const place = autoCompleteRef.current?.getPlace();
+        if (place?.geometry?.location) {
+          setAddress(place.name || "");
+          setLocation({
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          });
+        }
+      });
+    }
+  }, []);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -39,7 +63,13 @@ export const CreateChurch: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await createChurch({ name, slug, address, logoStorageId: logoStorageId as any });
+      await createChurch({ 
+        name, 
+        slug, 
+        address, 
+        logoStorageId: logoStorageId as any,
+        location
+      });
       window.location.href = '/';
     } catch (error: any) {
       alert(error.message);
@@ -92,6 +122,7 @@ export const CreateChurch: React.FC = () => {
             <div className={styles.inputWithIcon}>
               <MapPin size={18} />
               <input 
+                ref={inputRef}
                 type="text" 
                 placeholder="123 Faith St, City, Country" 
                 value={address}

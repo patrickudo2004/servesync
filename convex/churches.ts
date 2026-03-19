@@ -8,6 +8,10 @@ export const createChurch = mutation({
     slug: v.string(),
     address: v.optional(v.string()),
     logoStorageId: v.optional(v.id("_storage")),
+    location: v.optional(v.object({
+      lat: v.number(),
+      lng: v.number(),
+    })),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -26,6 +30,7 @@ export const createChurch = mutation({
       address: args.address,
       logoStorageId: args.logoStorageId,
       superAdminId: userId,
+      location: args.location,
     });
 
     await ctx.db.patch(userId, {
