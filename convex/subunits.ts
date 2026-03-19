@@ -34,3 +34,61 @@ export const createSubunit = mutation({
     });
   },
 });
+
+export const updateSubunit = mutation({
+  args: {
+    id: v.id("subunits"),
+    name: v.optional(v.string()),
+    leadId: v.optional(v.id("users")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    if (user?.role !== "SuperAdmin") throw new Error("Unauthorized");
+
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+  },
+});
+
+export const deleteSubunit = mutation({
+  args: { id: v.id("subunits") },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    if (user?.role !== "SuperAdmin") throw new Error("Unauthorized");
+
+    await ctx.db.delete(args.id);
+  },
+});
+
+export const getLiveAttendance = query({
+  args: {
+    serviceId: v.optional(v.id("services")),
+    subunitId: v.optional(v.id("subunits")),
+  },
+  handler: async (ctx, args) => {
+    if (!args.serviceId || !args.subunitId) return [];
+
+    const attendance = await ctx.db
+      .query("attendance")
+      .withIndex("by_service", (q) => q.eq("serviceId", args.serviceId!))
+      .collect();
+
+    // Filter by subunit and fetch user details
+    const results = [];
+    for (const record of attendance) {
+      const user = await ctx.db.get(record.userId);
+      if (user?.subunit === args.subunitId) {
+        results.push({
+          ...record,
+          user,
+        });
+      }
+    }
+
+    return results;
+  },
+});

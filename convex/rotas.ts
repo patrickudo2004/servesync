@@ -10,6 +10,11 @@ export const createRotaEntry = mutation({
     role: v.string(),
   },
   handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) throw new Error("User has no church");
+
     return await ctx.db.insert("rotas", {
       serviceId: args.serviceId,
       subunitId: args.subunitId,
@@ -20,25 +25,88 @@ export const createRotaEntry = mutation({
   },
 });
 
-export const updateRotaStatus = mutation({
-  args: {
-    rotaId: v.id("rotas"),
-    status: v.union(v.literal("Confirmed"), v.literal("Declined")),
+export const removeRotaEntry = mutation({
+  args: { rotaId: v.id("rotas") },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    const entry = await ctx.db.get(args.rotaId);
+    
+    // Auth: Only Leads or Admins can remove
+    if (user?.role === "Volunteer") throw new Error("Unauthorized");
+    
+    await ctx.db.delete(args.rotaId);
+  },
+});
+
+export const getRotaForWeek = query({
+  args: { 
+    startDate: v.number(), // Timestamp of start of week
+    endDate: v.number(),   // Timestamp of end of week
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.rotaId, { status: args.status });
+    const userId = await auth.getUserId(ctx);
+    if (!userId) return [];
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) return [];
+
+    // 1. Get all services in the range for this church
+    const services = await ctx.db
+      .query("services")
+      .withIndex("by_church", (q) => q.eq("churchId", user.churchId))
+      .filter((q) => q.and(
+        q.gte(q.field("startTime"), args.startDate),
+        q.lte(q.field("startTime"), args.endDate)
+      ))
+      .collect();
+    
+    const serviceIds = services.map(s => s._id);
+
+    // 2. Get all rota entries for these services
+    const results = [];
+    for (const serviceId of serviceIds) {
+      const entries = await ctx.db
+        .query("rotas")
+        .withIndex("by_service", (q) => q.eq("serviceId", serviceId))
+        .collect();
+      
+      const serviceDetail = services.find(s => s._id === serviceId);
+
+      for (const entry of entries) {
+        const attendee = await ctx.db.get(entry.userId);
+        const subunit = await ctx.db.get(entry.subunitId);
+        results.push({
+          ...entry,
+          userName: attendee?.name || attendee?.email || "Unknown",
+          userRole: attendee?.role || "Volunteer",
+          position: entry.role,
+          date: serviceDetail?.startTime,
+          serviceName: serviceDetail?.name,
+          subunitName: subunit?.name,
+        });
+      }
+    }
+
+    return results;
   },
 });
 
 export const getServiceRota = query({
   args: { serviceId: v.id("services") },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const entries = await ctx.db
       .query("rotas")
       .withIndex("by_service", (q) => q.eq("serviceId", args.serviceId))
       .collect();
+    
+    return await Promise.all(entries.map(async (e) => {
+      const user = await ctx.db.get(e.userId);
+      return { ...e, userName: user?.name, userEmail: user?.email };
+    }));
   },
 });
+
 export const getMyShifts = query({
   handler: async (ctx) => {
     const userId = await auth.getUserId(ctx);

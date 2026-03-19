@@ -28,6 +28,8 @@ export default defineSchema({
     availability: v.optional(v.any()), // JSON blob for 4-week calendar
     onboardingCompleted: v.optional(v.boolean()),
     skills: v.optional(v.array(v.string())),
+    points: v.optional(v.number()), // Current spendable points
+    totalPointsEarned: v.optional(v.number()), // Lifetime earnings
     additionalSubunits: v.optional(v.array(v.string())),
     isExtendedProbation: v.optional(v.boolean()),
     isBorrowed: v.optional(v.boolean()),
@@ -182,7 +184,8 @@ export default defineSchema({
     expiresAt: v.number(),
     status: v.union(v.literal("pending"), v.literal("accepted"), v.literal("revoked"), v.literal("expired")),
   }).index("by_token", ["token"])
-    .index("by_email_church", ["email", "churchId"]),
+    .index("by_email_church", ["email", "churchId"])
+    .index("by_church_status", ["churchId", "status"]),
 
   notifications: defineTable({
     userId: v.id("users"),
@@ -220,4 +223,23 @@ export default defineSchema({
     size: v.number(),
     userId: v.id("users"),
   }),
+
+  rewards: defineTable({
+    churchId: v.id("churches"),
+    name: v.string(),
+    description: v.string(),
+    cost: v.number(),
+    stock: v.optional(v.number()),
+    image: v.optional(v.string()),
+    category: v.union(v.literal("Food"), v.literal("Merch"), v.literal("Experience"), v.literal("Other")),
+  }).index("by_church", ["churchId"]),
+
+  redemptions: defineTable({
+    userId: v.id("users"),
+    rewardId: v.id("rewards"),
+    churchId: v.id("churches"),
+    status: v.union(v.literal("pending"), v.literal("fulfilled"), v.literal("cancelled")),
+    redeemedAt: v.number(),
+  }).index("by_user", ["userId"])
+    .index("by_church", ["churchId"]),
 });

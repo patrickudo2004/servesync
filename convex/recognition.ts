@@ -40,6 +40,12 @@ export const awardBadge = mutation({
       churchId: targetUser.churchId!,
     });
 
+    // Award points
+    await ctx.db.patch(args.userId, {
+      points: (targetUser.points || 0) + 100,
+      totalPointsEarned: (targetUser.totalPointsEarned || 0) + 100,
+    });
+
     // Notify user
     await ctx.db.insert("notifications", {
       userId: args.userId,
@@ -180,6 +186,12 @@ export async function checkMilestonesInternal(ctx: any, userId: any) {
           badgeId: badge._id,
           awardedAt: Date.now(),
           churchId: user.churchId!,
+        });
+
+        // Award points for milestone
+        await ctx.db.patch(userId, {
+          points: (user.points || 0) + 50,
+          totalPointsEarned: (user.totalPointsEarned || 0) + 50,
         });
 
         await ctx.db.insert("notifications", {

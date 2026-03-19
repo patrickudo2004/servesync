@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { User, Flame, Clock, Calendar, Award } from 'lucide-react';
+import { User, Flame, Clock, Calendar, Award, Coins } from 'lucide-react';
 import { BadgeDisplay } from './BadgeDisplay';
 import styles from './VolunteerProfile.module.css';
 
@@ -43,6 +43,11 @@ export const VolunteerProfile: React.FC<VolunteerProfileProps> = ({ userId }) =>
           <Clock className={styles.hoursIcon} size={24} />
           <div className={styles.statValue}>{stats.totalHours}</div>
           <div className={styles.statLabel}>Total Hours</div>
+        </div>
+        <div className={styles.statCard}>
+          <Coins className={styles.pointsIcon} size={24} />
+          <div className={styles.statValue}>{user.points || 0}</div>
+          <div className={styles.statLabel}>Service Points</div>
         </div>
       </div>
 

@@ -3,9 +3,11 @@ import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { BarChart, Bar, ResponsiveContainer, Cell } from 'recharts';
 import { LayoutGrid, Users, TrendingUp, ShieldCheck, ChevronRight, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import styles from './mobile.module.css';
 
 export const SuperAdminHome: React.FC = () => {
+  const navigate = useNavigate();
   const stats = useQuery(api.churches.getChurchStats);
   const subunits = useQuery(api.subunits.getSubunits);
 
@@ -56,7 +58,7 @@ export const SuperAdminHome: React.FC = () => {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Departments</h2>
-          <button className={styles.linkBtn}>Manage</button>
+          <button className={styles.linkBtn} onClick={() => navigate('/admin')}>Manage</button>
         </div>
         <div className={styles.list}>
           {subunits.length === 0 ? (
@@ -86,7 +88,11 @@ export const SuperAdminHome: React.FC = () => {
         </div>
         <div className={styles.card}>
           <div className={styles.list}>
-            <div className={styles.listItem} style={{ border: 'none', padding: 0 }}>
+            <div 
+              className={styles.listItem} 
+              style={{ border: 'none', padding: 0, cursor: 'pointer' }}
+              onClick={() => navigate('/invites')}
+            >
               <div className={styles.itemIcon} style={{ background: '#fef2f2', color: '#ef4444' }}>
                 <ShieldCheck size={20} />
               </div>

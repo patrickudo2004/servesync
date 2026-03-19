@@ -2,12 +2,15 @@ import React from 'react';
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Calendar, MapPin, QrCode, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
 import styles from './mobile.module.css';
 
 export const VolunteerHome: React.FC = () => {
+  const navigate = useNavigate();
   const nextService = useQuery(api.services.getNextService);
   const myShifts = useQuery(api.rotas.getMyShifts);
+  const church = useQuery(api.churches.getMyChurch);
 
   if (nextService === undefined || myShifts === undefined) {
     return (
@@ -72,14 +75,14 @@ export const VolunteerHome: React.FC = () => {
               <MapPin size={20} />
             </div>
             <div className={styles.itemInfo}>
-              <p className={styles.itemTitle}>Main Sanctuary</p>
-              <p className={styles.itemSubtitle}>123 Church Street, City</p>
+              <p className={styles.itemTitle}>{church?.name || 'Main Sanctuary'}</p>
+              <p className={styles.itemSubtitle}>{church?.address || 'Location not set'}</p>
             </div>
           </div>
         </div>
       </section>
 
-      <button className={styles.floatingBtn}>
+      <button className={styles.floatingBtn} onClick={() => navigate('/attendance')}>
         <QrCode size={24} />
       </button>
     </div>

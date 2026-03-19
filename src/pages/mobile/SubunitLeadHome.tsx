@@ -3,9 +3,11 @@ import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Users, QrCode, MessageSquare, Loader2, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import styles from './mobile.module.css';
 
 export const SubunitLeadHome: React.FC = () => {
+  const navigate = useNavigate();
   const me = useQuery(api.users.me);
   const nextService = useQuery(api.services.getNextService);
   const subunits = useQuery(api.subunits.getSubunits);
@@ -15,7 +17,7 @@ export const SubunitLeadHome: React.FC = () => {
   
   const liveAttendance = useQuery(
     api.subunits.getLiveAttendance, 
-    nextService && mySubunitId ? { serviceId: nextService._id, subunitId: mySubunitId } : "skip"
+    nextService && mySubunitId ? { serviceId: nextService._id, subunitId: mySubunitId as any } : "skip"
   );
 
   if (me === undefined || nextService === undefined || liveAttendance === undefined) {
@@ -76,7 +78,7 @@ export const SubunitLeadHome: React.FC = () => {
       </section>
 
       <section className={styles.section}>
-        <div className={styles.card}>
+        <div className={styles.card} onClick={() => navigate('/chat')} style={{ cursor: 'pointer' }}>
           <div className={styles.sectionHeader}>
             <h3 className={styles.itemTitle}>Subunit Chat</h3>
             <MessageSquare size={18} color="#8b5cf6" />
@@ -85,7 +87,7 @@ export const SubunitLeadHome: React.FC = () => {
         </div>
       </section>
 
-      <button className={styles.floatingBtn}>
+      <button className={styles.floatingBtn} onClick={() => navigate('/attendance')}>
         <QrCode size={24} />
       </button>
     </div>

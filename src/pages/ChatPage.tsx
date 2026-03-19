@@ -11,7 +11,8 @@ import {
   Paperclip,
   Loader2,
   MoreVertical,
-  Pin
+  Pin,
+  Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import styles from './ChatPage.module.css';
@@ -21,6 +22,8 @@ export const ChatPage: React.FC = () => {
   const [selectedChannelId, setSelectedChannelId] = useState<any>(null);
   const messages = useQuery(api.chat.getChannelMessages, selectedChannelId ? { channelId: selectedChannelId } : "skip");
   const sendMessage = useMutation(api.chat.sendMessage);
+  const deleteMessage = useMutation(api.chat.deleteMessage);
+  const me = useQuery(api.users.me);
   
   const [inputText, setInputText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -45,6 +48,12 @@ export const ChatPage: React.FC = () => {
       await sendMessage({ channelId: selectedChannelId, text });
     } catch (err: any) {
       alert(err.message);
+    }
+  };
+
+  const handleDeleteMessage = async (msgId: any) => {
+    if (confirm("Delete this message?")) {
+      await deleteMessage({ messageId: msgId });
     }
   };
 
@@ -107,6 +116,15 @@ export const ChatPage: React.FC = () => {
                   </div>
                   <div className={styles.text}>{msg.text}</div>
                   {msg.isPinned && <div className={styles.pinnedBadge}><Pin size={10} /> Pinned</div>}
+                  
+                  {(me?._id === msg.userId || ['SuperAdmin', 'DepartmentHead', 'PastoralOversight'].includes(me?.role || '')) && (
+                    <button 
+                      className={styles.deleteMsgBtn} 
+                      onClick={() => handleDeleteMessage(msg._id)}
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))

@@ -9,6 +9,7 @@ import {
   LogOut,
   ChevronRight,
   Users,
+  Shield,
 } from 'lucide-react';
 import { RoleBadge, UserRole } from './RoleBadge';
 import { ThemeToggle } from './ThemeToggle';
@@ -32,6 +33,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
 
   const navItems = [
     { label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer', 'Probation', 'OnNotice'] },
+    { label: 'Admin', icon: <Shield size={20} />, path: '/admin', roles: ['SuperAdmin'] },
+    { label: 'Services', icon: <Calendar size={20} />, path: '/services', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead'] },
     { label: 'Attendance', icon: <UserCheck size={20} />, path: '/attendance', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer', 'Probation', 'OnNotice'] },
     { label: 'Rota', icon: <Calendar size={20} />, path: '/rota', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer'] },
     { label: 'Time Off', icon: <Clock size={20} />, path: '/time-off', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer'] },

@@ -6,7 +6,8 @@ import {
   CheckCircle,
   Clock,
   AlertTriangle,
-  ChevronRight
+  ChevronRight,
+  Settings as SettingsIcon
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -21,6 +22,7 @@ import {
 } from 'recharts';
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { useNavigate } from "react-router-dom";
 import { Organogram, OrgNode } from '../components/Organogram';
 import { UserRole } from '../components/RoleBadge';
 import { OversightDashboardTab } from '../components/OversightDashboardTab';
@@ -33,7 +35,11 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
+  const navigate = useNavigate();
   const me = useQuery(api.users.me);
+  const stats = useQuery(api.churches.getChurchStats);
+  const activities = useQuery(api.churches.getRecentActivities);
+  
   const ensureChannels = useMutation(api.chat.ensureChannels);
   const seedBadges = useMutation(api.recognition.seedBadges);
 
@@ -52,14 +58,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
         <OversightDashboardTab department={me.department} />
       )}
 
+      {userRole === 'SuperAdmin' && (
+        <div className="flex justify-end mb-4">
+          <button 
+            onClick={() => navigate('/admin/settings')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:text-purple-600 hover:border-purple-200 transition-all text-sm font-medium shadow-sm"
+          >
+            <SettingsIcon size={16} />
+            Church Settings
+          </button>
+        </div>
+      )}
+
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <div className={styles.statHeader}>
             <Users className={styles.statIcon} style={{ color: '#8b5cf6' }} />
             <span className={styles.statLabel}>Total Volunteers</span>
           </div>
-          <div className={styles.statValue}>124</div>
-          <div className={styles.statTrend}>+12% from last month</div>
+          <div className={styles.statValue}>{stats?.totalVolunteers ?? 0}</div>
+          <div className={styles.statTrend}>{stats?.totalVolunteers ? "Active workforce" : "Invite your first volunteer"}</div>
         </div>
         
         <div className={styles.statCard}>
@@ -67,8 +85,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
             <CheckCircle className={styles.statIcon} style={{ color: '#10b981' }} />
             <span className={styles.statLabel}>Avg. Attendance</span>
           </div>
-          <div className={styles.statValue}>88%</div>
-          <div className={styles.statTrend}>Stable</div>
+          <div className={styles.statValue}>{stats?.avgAttendance ?? 0}%</div>
+          <div className={styles.statTrend}>Last 5 services</div>
         </div>
 
         <div className={styles.statCard}>
@@ -76,17 +94,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
             <CalendarIcon className={styles.statIcon} style={{ color: '#3b82f6' }} />
             <span className={styles.statLabel}>Upcoming Services</span>
           </div>
-          <div className={styles.statValue}>4</div>
-          <div className={styles.statTrend}>Next: Sunday 9AM</div>
+          <div className={styles.statValue}>{stats?.upcomingServices ?? 0}</div>
+          <div className={styles.statTrend}>
+            {stats?.nextService ? `Next: ${new Date(stats.nextService.startTime).toLocaleDateString()}` : "No upcoming services"}
+          </div>
         </div>
 
         <div className={styles.statCard}>
           <div className={styles.statHeader}>
             <Clock className={styles.statIcon} style={{ color: '#f59e0b' }} />
-            <span className={styles.statLabel}>Pending Requests</span>
+            <span className={styles.statLabel}>Pending Tasks</span>
           </div>
-          <div className={styles.statValue}>7</div>
-          <div className={styles.statTrend}>Requires approval</div>
+          <div className={styles.statValue}>{stats?.pendingRequests ?? 0}</div>
+          <div className={styles.statTrend}>Swaps & Invites</div>
         </div>
       </div>
 
@@ -124,16 +144,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
             <h2>Recent Alerts</h2>
           </div>
           <div className={styles.activityList}>
-            {[1, 2, 3].map(i => (
-              <div key={i} className={styles.activityItem}>
+            {activities?.length ? activities.map(activity => (
+              <div key={activity._id} className={styles.activityItem}>
                 <div className={styles.activityIndicator} />
                 <div className={styles.activityContent}>
-                  <p className={styles.activityTitle}>Rota Gap Detected</p>
-                  <p className={styles.activityMeta}>Audio-Visual department has a missing Sound Lead for Sunday.</p>
+                  <p className={styles.activityTitle}>{activity.title}</p>
+                  <p className={styles.activityMeta}>{activity.message}</p>
                 </div>
                 <ChevronRight size={16} className={styles.activityAction} />
               </div>
-            ))}
+            )) : (
+              <div className="p-4 text-center text-gray-400">
+                No recent alerts.
+              </div>
+            )}
           </div>
         </div>
       </div>

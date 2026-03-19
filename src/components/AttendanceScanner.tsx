@@ -15,17 +15,7 @@ export const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onScan, is
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
   useEffect(() => {
-    // 1. Request Location on mount
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => setLocation(pos),
-        (err) => setError("Location access is required for attendance verification.")
-      );
-    } else {
-      setError("Geolocation is not supported by your browser.");
-    }
-
-    // 2. Initialize Scanner
+    // 1. Initialize Scanner IMMEDIATELY
     scannerRef.current = new Html5QrcodeScanner(
       "qr-reader",
       { fps: 10, qrbox: { width: 250, height: 250 } },
@@ -34,7 +24,13 @@ export const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onScan, is
 
     scannerRef.current.render(
       async (decodedText) => {
-        if (isProcessing || !location) return;
+        // Block scanning logic if processing or no location, 
+        // but feed remains visible
+        if (isProcessing) return;
+        if (!location) {
+          setError("GPS Location is required before you can scan.");
+          return;
+        }
         
         try {
           setError(null);
@@ -49,6 +45,16 @@ export const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onScan, is
         // quiet error
       }
     );
+
+    // 2. Request Location in parallel
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setLocation(pos),
+        (err) => setError("Location access is required for attendance verification.")
+      );
+    } else {
+      setError("Geolocation is not supported by your browser.");
+    }
 
     return () => {
       scannerRef.current?.clear().catch(console.error);

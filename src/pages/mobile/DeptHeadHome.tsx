@@ -1,20 +1,40 @@
 import React, { useState } from 'react';
-import { BarChart3, Users, AlertCircle, ArrowRightLeft, ChevronRight } from 'lucide-react';
+import { BarChart3, Users, AlertCircle, ArrowRightLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { useQuery } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
+import { useNavigate } from 'react-router-dom';
 import styles from './mobile.module.css';
 
 export const DeptHeadHome: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Subunits');
+  const me = useQuery(api.users.me);
+  const health = useQuery(api.oversight.getDepartmentHealth, 
+    me?.department ? { department: me.department } : "skip"
+  );
+  const subunits = useQuery(api.subunits.getSubunits);
+
+  if (!me || health === undefined || subunits === undefined) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="animate-spin text-purple-600" size={32} />
+      </div>
+    );
+  }
+
+  // Filter subunits for this department
+  const mySubunits = subunits.filter(s => s.department === me.department);
 
   return (
     <div className={styles.page}>
       <div className={styles.grid}>
         <div className={styles.card + ' ' + styles.statCard}>
-          <span className={styles.statValue}>92%</span>
+          <span className={styles.statValue}>{health?.attendanceRate || 0}%</span>
           <span className={styles.statLabel}>Avg Attendance</span>
         </div>
         <div className={styles.card + ' ' + styles.statCard}>
-          <span className={styles.statValue}>3</span>
-          <span className={styles.statLabel}>Open Gaps</span>
+          <span className={styles.statValue}>{health?.activeProbations || 0}</span>
+          <span className={styles.statLabel}>Active Gaps</span>
         </div>
       </div>
 
@@ -33,22 +53,24 @@ export const DeptHeadHome: React.FC = () => {
       <section className={styles.section}>
         {activeTab === 'Subunits' && (
           <div className={styles.list}>
-            {[
-              { name: 'Camera Unit', lead: 'Peter Parker', health: 'Good' },
-              { name: 'Sound Unit', lead: 'Tony Stark', health: 'Needs Help' },
-              { name: 'Projection', lead: 'Bruce Banner', health: 'Good' },
-            ].map((unit, i) => (
-              <div key={i} className={styles.listItem}>
-                <div className={styles.itemIcon}>
-                  <Users size={20} />
-                </div>
-                <div className={styles.itemInfo}>
-                  <p className={styles.itemTitle}>{unit.name}</p>
-                  <p className={styles.itemSubtitle}>Lead: {unit.lead}</p>
-                </div>
-                <ChevronRight size={16} color="#9ca3af" />
+            {mySubunits.length === 0 ? (
+              <div className="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-gray-400">
+                No subunits in your department yet.
               </div>
-            ))}
+            ) : (
+              mySubunits.map((unit) => (
+                <div key={unit._id} className={styles.listItem}>
+                  <div className={styles.itemIcon}>
+                    <Users size={20} />
+                  </div>
+                  <div className={styles.itemInfo}>
+                    <p className={styles.itemTitle}>{unit.name}</p>
+                    <p className={styles.itemSubtitle}>Lead: {unit.leadId || 'Not Assigned'}</p>
+                  </div>
+                  <ChevronRight size={16} color="#9ca3af" />
+                </div>
+              ))
+            )}
           </div>
         )}
 
@@ -83,9 +105,10 @@ export const DeptHeadHome: React.FC = () => {
       <style dangerouslySetInnerHTML={{ __html: `
         .${styles.tabs} {
           display: flex;
-          background: #f3f4f6;
+          background: var(--bg-secondary);
           padding: 4px;
           border-radius: 12px;
+          margin: 1rem 0;
         }
         .${styles.tab} {
           flex: 1;
@@ -94,13 +117,13 @@ export const DeptHeadHome: React.FC = () => {
           background: transparent;
           font-size: 0.875rem;
           font-weight: 600;
-          color: #6b7280;
+          color: var(--text-secondary);
           border-radius: 8px;
           cursor: pointer;
         }
         .${styles.activeTab} {
-          background: white;
-          color: #111827;
+          background: var(--card-bg);
+          color: var(--text-primary);
           box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
       `}} />
