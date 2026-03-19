@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Mail, Loader2, Church } from 'lucide-react';
+import { ThemeToggle } from '../components/ThemeToggle';
 import styles from './Login.module.css';
 
 export const Login: React.FC = () => {
@@ -51,6 +52,9 @@ export const Login: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
+        <ThemeToggle />
+      </div>
       <div className={styles.card}>
         <div className={styles.logoWrapper}>
           <Church size={40} className={styles.logoIcon} />

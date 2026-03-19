@@ -12,6 +12,9 @@
   --text-secondary: #4b5563;
   --border-color: #e5e7eb;
   --sidebar-bg: #ffffff;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-border: #e5e7eb;
 }
 
 .dark {
@@ -21,6 +24,9 @@
   --text-secondary: #9ca3af;
   --border-color: #374151;
   --sidebar-bg: #111827;
+  --card-bg: #1f2937;
+  --input-bg: #111827;
+  --input-border: #374151;
 }
 
 body {

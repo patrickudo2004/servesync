@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Camera, Phone, Calendar, ChevronRight, Loader2, Check } from 'lucide-react';
+import { ThemeToggle } from '../components/ThemeToggle';
 import styles from './OnboardingWizard.module.css';
 
 export const OnboardingWizard: React.FC = () => {
@@ -55,6 +56,9 @@ export const OnboardingWizard: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
+        <ThemeToggle />
+      </div>
       <div className={styles.wizardCard}>
         <div className={styles.progress}>
           {[1, 2, 3].map(i => (

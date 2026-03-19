@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Church, MapPin, Globe, Loader2, Check } from 'lucide-react';
+import { ThemeToggle } from '../components/ThemeToggle';
 import styles from './CreateChurch.module.css';
 
 export const CreateChurch: React.FC = () => {
@@ -80,6 +81,9 @@ export const CreateChurch: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
+        <ThemeToggle />
+      </div>
       <div className={styles.card}>
         <div className={styles.header}>
           <div className={styles.iconBox}>

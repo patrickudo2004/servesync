@@ -3,12 +3,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9fafb;
+  background-color: var(--bg-secondary);
   padding: 1.5rem;
 }
 
 .card {
-  background: white;
+  background: var(--card-bg);
   padding: 3rem;
   border-radius: 32px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
@@ -24,7 +24,7 @@
 .iconBox {
   width: 64px;
   height: 64px;
-  background: #f5f3ff;
+  background: var(--bg-secondary);
   color: #8b5cf6;
   border-radius: 16px;
   display: flex;
@@ -36,12 +36,12 @@
 .header h1 {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .header p {
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .form {
@@ -59,12 +59,14 @@
 .field label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .field input {
   padding: 0.875rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-primary);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s;
@@ -79,15 +81,15 @@
 .slugInput {
   display: flex;
   align-items: center;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-secondary);
+  border: 1px solid var(--input-border);
   border-radius: 12px;
   padding-left: 1rem;
   overflow: hidden;
 }
 
 .slugInput span {
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-size: 0.875rem;
   user-select: none;
 }
@@ -95,6 +97,7 @@
 .slugInput input {
   border: none;
   background: transparent;
+  color: var(--text-primary);
   flex: 1;
   padding-left: 0.25rem;
 }
@@ -108,7 +111,7 @@
 .inputWithIcon svg {
   position: absolute;
   left: 1rem;
-  color: #9ca3af;
+  color: var(--text-secondary);
 }
 
 .inputWithIcon input {
@@ -116,8 +119,8 @@
 }
 
 .uploadBtn {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 1rem;
   border-radius: 12px;
   font-weight: 600;
@@ -127,7 +130,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: 2px dashed #e5e7eb;
+  border: 2px dashed var(--input-border);
 }
 
 .submitBtn {

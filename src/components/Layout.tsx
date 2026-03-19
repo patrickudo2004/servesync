@@ -9,11 +9,9 @@ import {
   LogOut,
   ChevronRight,
   Users,
-  Sun,
-  Moon
 } from 'lucide-react';
 import { RoleBadge, UserRole } from './RoleBadge';
-import { useTheme } from '../contexts/ThemeContext';
+import { ThemeToggle } from './ThemeToggle';
 import styles from './Layout.module.css';
 
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -30,7 +28,6 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
   const { signOut } = useAuthActions();
 
   const navItems = [
@@ -56,9 +53,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
           <p className={styles.churchName}>{user.churchName}</p>
           <div className="flex items-center justify-between">
             <RoleBadge role={user.role} />
-            <button onClick={toggleTheme} className={styles.themeToggle}>
-              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-            </button>
+            <ThemeToggle className={styles.themeToggle} />
           </div>
         </div>
 

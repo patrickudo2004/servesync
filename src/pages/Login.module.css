@@ -3,17 +3,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f9fafb;
-  padding: 1.5rem;
+  background-color: var(--bg-secondary);
+  padding: 1rem;
 }
 
 .card {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 24px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  background: var(--card-bg);
+  padding: 3rem 2.5rem;
+  border-radius: 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   text-align: center;
 }
 
@@ -22,7 +22,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .logoIcon {
@@ -32,20 +32,25 @@
 .logoText {
   font-size: 1.5rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  color: #111827;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
+}
+
+.header {
+  margin-bottom: 2.5rem;
 }
 
 .header h1 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #111827;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
 }
 
 .header p {
-  color: #6b7280;
-  margin-bottom: 2.5rem;
+  color: var(--text-secondary);
+  font-size: 1.0625rem;
 }
 
 .actions {
@@ -82,10 +87,9 @@
 .divider {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  color: #9ca3af;
+  margin: 1.5rem 0;
+  color: var(--text-secondary);
   font-size: 0.875rem;
-  margin: 0.5rem 0;
 }
 
 .divider::before,
@@ -93,13 +97,17 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: #e5e7eb;
+  background: var(--border-color);
+}
+
+.divider span {
+  padding: 0 1rem;
 }
 
 .emailForm {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .inputGroup {
@@ -111,13 +119,15 @@
 .inputIcon {
   position: absolute;
   left: 1rem;
-  color: #9ca3af;
+  color: var(--text-secondary);
 }
 
 .inputGroup input {
   width: 100%;
   padding: 0.875rem 1rem 0.875rem 2.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-primary);
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s;
