@@ -3,11 +3,16 @@ import { mutation, query } from "./_generated/server";
 import { auth } from "./auth";
 
 export const getChurchServices = query({
-  args: { churchId: v.id("churches") },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) return [];
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) return [];
+
     return await ctx.db
       .query("services")
-      .withIndex("by_church", (q) => q.eq("churchId", args.churchId))
+      .withIndex("by_church", (q) => q.eq("churchId", user.churchId!))
       .order("desc")
       .collect();
   },
