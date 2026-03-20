@@ -122,31 +122,59 @@
 
 .subunitList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
 }
 
-.subunitItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.25rem;
+.subunitCard {
   background: var(--bg-secondary);
   border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  border: 1px solid var(--border-color);
 }
 
-.subunitItem div {
+.cardInfo {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+  flex: 1;
 }
 
-.subunitItem strong {
-  color: var(--text-primary);
-}
-
-.subunitItem span {
+.assignmentRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.8125rem;
+}
+
+.assignmentRow label {
   color: var(--text-secondary);
+  min-width: 60px;
+}
+
+.assignmentRow select {
+  flex: 1;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+}
+
+.deptBadge {
+  font-size: 0.75rem;
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+  font-weight: 500;
+  display: inline-block;
 }
 
 .deleteBtn {
@@ -155,6 +183,12 @@
   border: none;
   cursor: pointer;
   padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #fef2f2;
 }
 
 .userTableWrapper {

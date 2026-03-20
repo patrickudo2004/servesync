@@ -17,13 +17,18 @@ export default defineSchema({
     role: v.optional(v.union(
       v.literal("Volunteer"),
       v.literal("SubunitLead"),
+      v.literal("SubunitAssistant"),
       v.literal("DepartmentHead"),
+      v.literal("DepartmentAssistant"),
       v.literal("PastoralOversight"),
       v.literal("Probation"),
       v.literal("OnNotice"),
       v.literal("SuperAdmin")
     )),
-    department: v.optional(v.string()),
+    departmentId: v.optional(v.id("departments")),
+    subunitId: v.optional(v.id("subunits")),
+    // Legacy fields kept for compatibility during migration if needed
+    department: v.optional(v.string()), 
     subunit: v.optional(v.string()),
     availability: v.optional(v.any()), // JSON blob for 4-week calendar
     onboardingCompleted: v.optional(v.boolean()),
@@ -60,14 +65,24 @@ export default defineSchema({
     startTime: v.number(),
     endTime: v.number(),
     qrCodeSecret: v.optional(v.string()),
+    qrType: v.optional(v.union(v.literal("Unique"), v.literal("Generic"))),
+  }).index("by_church", ["churchId"]),
+
+  departments: defineTable({
+    churchId: v.id("churches"),
+    name: v.string(),
+    headId: v.optional(v.id("users")),
+    assistantId: v.optional(v.id("users")),
   }).index("by_church", ["churchId"]),
 
   subunits: defineTable({
     churchId: v.id("churches"),
-    department: v.string(),
+    departmentId: v.id("departments"),
     name: v.string(),
     leadId: v.optional(v.id("users")),
-  }).index("by_church", ["churchId"]),
+    assistantId: v.optional(v.id("users")),
+  }).index("by_church", ["churchId"])
+    .index("by_department", ["departmentId"]),
 
   rotas: defineTable({
     serviceId: v.id("services"),
@@ -178,6 +193,9 @@ export default defineSchema({
     churchId: v.id("churches"),
     invitedBy: v.id("users"),
     role: v.string(),
+    departmentId: v.optional(v.id("departments")),
+    subunitId: v.optional(v.id("subunits")),
+    // Legacy fields
     department: v.optional(v.string()),
     subunit: v.optional(v.string()),
     token: v.string(),
@@ -198,13 +216,16 @@ export default defineSchema({
   channels: defineTable({
     churchId: v.id("churches"),
     type: v.union(v.literal("announcement"), v.literal("department"), v.literal("subunit")),
+    departmentId: v.optional(v.id("departments")),
+    subunitId: v.optional(v.id("subunits")),
+    // Legacy fields
     department: v.optional(v.string()),
     subunit: v.optional(v.string()),
     name: v.string(),
     isDisabled: v.boolean(),
   }).index("by_church", ["churchId"])
-    .index("by_dept", ["churchId", "department"])
-    .index("by_subunit", ["churchId", "department", "subunit"]),
+    .index("by_dept", ["churchId", "departmentId"])
+    .index("by_subunit", ["churchId", "departmentId", "subunitId"]),
 
   messages: defineTable({
     channelId: v.id("channels"),

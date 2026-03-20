@@ -63,12 +63,60 @@
 
 .dayHeader {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   padding: 1rem;
   background: white;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
+}
+
+.dayInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.dayAddBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dayAddBtn:hover {
+  background: #f5f3ff;
+  color: #8b5cf6;
+  border-color: #c4b5fd;
+}
+
+.serviceTag {
+  font-size: 0.7rem;
+  color: #8b5cf6;
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
 }
 
 .today {

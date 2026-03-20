@@ -29,14 +29,47 @@ export const Rota: React.FC = () => {
 
   const createShift = useMutation(api.rotas.createRotaEntry);
   const removeShift = useMutation(api.rotas.removeRotaEntry);
+  const createService = useMutation(api.services.createService);
 
   const [isAssigning, setIsAssigning] = useState(false);
+  const [isAddingService, setIsAddingService] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+
   const [newShift, setNewShift] = useState({
     userId: '',
     serviceId: '',
     subunitId: '',
     role: ''
   });
+
+  const [newService, setNewService] = useState({
+    name: '',
+    time: '09:00',
+    qrType: 'Unique' as 'Unique' | 'Generic'
+  });
+
+  const handleCreateService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDay) return;
+    
+    try {
+      const [hours, minutes] = newService.time.split(':').map(Number);
+      const startTime = new Date(selectedDay);
+      startTime.setHours(hours, minutes, 0, 0);
+      const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); // 2h default
+
+      await createService({
+        name: newService.name,
+        startTime: startTime.getTime(),
+        endTime: endTime.getTime(),
+        qrType: newService.qrType
+      });
+      setIsAddingService(false);
+      setNewService({ name: '', time: '09:00', qrType: 'Unique' });
+    } catch (err) {
+      alert("Failed to create service");
+    }
+  };
 
   const handleAssign = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,8 +128,17 @@ export const Rota: React.FC = () => {
         {weekDays.map(day => (
           <div key={day.toString()} className={styles.dayColumn}>
             <div className={`${styles.dayHeader} ${isSameDay(day, new Date()) ? styles.today : ''}`}>
-              <span className={styles.dayName}>{format(day, 'EEE')}</span>
-              <span className={styles.dayNumber}>{format(day, 'd')}</span>
+              <div className={styles.dayInfo}>
+                <span className={styles.dayName}>{format(day, 'EEE')}</span>
+                <span className={styles.dayNumber}>{format(day, 'd')}</span>
+              </div>
+              <button 
+                className={styles.dayAddBtn} 
+                onClick={() => { setSelectedDay(day); setIsAddingService(true); }}
+                title="Add Service"
+              >
+                <Plus size={14} />
+              </button>
             </div>
             
             <div className={styles.slots}>
@@ -113,6 +155,7 @@ export const Rota: React.FC = () => {
                         </button>
                       </div>
                     </div>
+                    <div className={styles.serviceTag}>{entry.serviceName}</div>
                     <div className={styles.cardUser}>
                       <div className={styles.avatar}>{entry.userName[0]}</div>
                       <div className={styles.userDetails}>
@@ -128,7 +171,7 @@ export const Rota: React.FC = () => {
                 onClick={() => setIsAssigning(true)}
               >
                 <Plus size={14} />
-                <span>Assign</span>
+                <span>Assign Volunteer</span>
               </button>
             </div>
           </div>
@@ -152,6 +195,62 @@ export const Rota: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Service Creation Modal */}
+      {isAddingService && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h2>Create Service for {selectedDay && format(selectedDay, 'MMM d')}</h2>
+              <button onClick={() => setIsAddingService(false)}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateService} className={styles.form}>
+              <div className={styles.field}>
+                <label>Service Name</label>
+                <input 
+                  placeholder="e.g. Sunday Morning Service" 
+                  value={newService.name}
+                  onChange={e => setNewService({...newService, name: e.target.value})}
+                  required
+                />
+              </div>
+              <div className={styles.field}>
+                <label>Start Time</label>
+                <input 
+                  type="time"
+                  value={newService.time}
+                  onChange={e => setNewService({...newService, time: e.target.value})}
+                  required
+                />
+              </div>
+              <div className={styles.field}>
+                <label>QR Code Type</label>
+                <div className={styles.radioGroup}>
+                  <label className={styles.radioLabel}>
+                    <input 
+                      type="radio" 
+                      value="Unique" 
+                      checked={newService.qrType === 'Unique'} 
+                      onChange={() => setNewService({...newService, qrType: 'Unique'})}
+                    />
+                    <span>Unique (Per Service)</span>
+                  </label>
+                  <label className={styles.radioLabel}>
+                    <input 
+                      type="radio" 
+                      value="Generic" 
+                      checked={newService.qrType === 'Generic'} 
+                      onChange={() => setNewService({...newService, qrType: 'Generic'})}
+                    />
+                    <span>Generic (Static)</span>
+                  </label>
+                </div>
+              </div>
+              <button type="submit" className={styles.submitBtn}>Create Service</button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Assignment Modal */}
       {isAssigning && (

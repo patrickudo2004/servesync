@@ -52,6 +52,10 @@
   border-bottom: 1px solid #f3f4f6;
   font-size: 0.875rem;
   color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
 }
 
 .emailCell {
@@ -59,6 +63,8 @@
   align-items: center;
   gap: 0.5rem;
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .deptText {

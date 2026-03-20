@@ -43,10 +43,20 @@ export const getAllChurchUsers = query({
     const user = await ctx.db.get(userId);
     if (!user?.churchId) return [];
 
-    return await ctx.db
+    const users = await ctx.db
       .query("users")
       .withIndex("by_church", (q) => q.eq("churchId", user.churchId!))
       .collect();
+
+    return Promise.all(users.map(async (u) => {
+      const dept = u.departmentId ? await ctx.db.get(u.departmentId) : null;
+      const sub = u.subunitId ? await ctx.db.get(u.subunitId) : null;
+      return {
+        ...u,
+        departmentName: dept?.name || "None",
+        subunitName: sub?.name || "None",
+      };
+    }));
   },
 });
 
@@ -55,13 +65,15 @@ export const updateUserRole = mutation({
     userId: v.id("users"),
     role: v.union(
       v.literal("Volunteer"),
+      v.literal("SubunitAssistant"),
       v.literal("SubunitLead"),
+      v.literal("DepartmentAssistant"),
       v.literal("DepartmentHead"),
       v.literal("PastoralOversight"),
       v.literal("SuperAdmin")
     ),
-    department: v.optional(v.string()),
-    subunit: v.optional(v.string()),
+    departmentId: v.optional(v.id("departments")),
+    subunitId: v.optional(v.id("subunits")),
   },
   handler: async (ctx, args) => {
     const adminId = await auth.getUserId(ctx);

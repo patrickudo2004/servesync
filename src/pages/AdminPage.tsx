@@ -8,43 +8,44 @@ import styles from './AdminPage.module.css';
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'hierarchy' | 'users' | 'settings'>('hierarchy');
   const organogramData = useQuery(api.churches.getOrganogram);
+  const departments = useQuery(api.departments.getDepartments);
   const subunits = useQuery(api.subunits.getSubunits);
   const users = useQuery(api.users.getAllChurchUsers);
   
+  const createDept = useMutation(api.departments.createDepartment);
+  const deleteDept = useMutation(api.departments.deleteDepartment);
   const createSubunit = useMutation(api.subunits.createSubunit);
   const deleteSubunit = useMutation(api.subunits.deleteSubunit);
   const updateUserRole = useMutation(api.users.updateUserRole);
 
+  const [isAddingDept, setIsAddingDept] = useState(false);
+  const [newDeptName, setNewDeptName] = useState('');
   const [isAddingSubunit, setIsAddingSubunit] = useState(false);
-  const [newSubunit, setNewSubunit] = useState({ name: '', department: '' });
+  const [newSubunit, setNewSubunit] = useState({ name: '', departmentId: '' as any });
+
+  const handleCreateDept = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createDept({ name: newDeptName });
+      setNewDeptName('');
+      setIsAddingDept(false);
+    } catch (err) {
+      alert("Failed to create department");
+    }
+  };
 
   const handleCreateSubunit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createSubunit({ name: newSubunit.name, department: newSubunit.department });
-      setNewSubunit({ name: '', department: '' });
+      await createSubunit({ name: newSubunit.name, departmentId: newSubunit.departmentId });
+      setNewSubunit({ name: '', departmentId: '' as any });
       setIsAddingSubunit(false);
     } catch (err) {
-      alert("Failed to create subunit");
+      alert("Failed to create subunit. Ensure you selected a department.");
     }
   };
 
-  const handleDeleteSubunit = async (id: any) => {
-    if (confirm("Are you sure you want to delete this subunit?")) {
-      await deleteSubunit({ id });
-    }
-  };
-
-  const handleRoleChange = async (userId: any, newRole: any) => {
-    try {
-      await updateUserRole({ userId, role: newRole });
-      alert("Role updated successfully");
-    } catch (err) {
-      alert("Failed to update role");
-    }
-  };
-
-  if (organogramData === undefined || subunits === undefined || users === undefined) {
+  if (organogramData === undefined || subunits === undefined || users === undefined || departments === undefined) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="animate-spin text-purple-600" size={32} />
@@ -54,6 +55,7 @@ export const AdminPage: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      {/* ... header remains same ... */}
       <header className={styles.header}>
         <div className={styles.titleInfo}>
           <Shield className={styles.headerIcon} />
@@ -63,24 +65,9 @@ export const AdminPage: React.FC = () => {
           </div>
         </div>
         <div className={styles.tabSwitcher}>
-          <button 
-            className={activeTab === 'hierarchy' ? styles.activeTab : ''} 
-            onClick={() => setActiveTab('hierarchy')}
-          >
-            Hierarchy
-          </button>
-          <button 
-            className={activeTab === 'users' ? styles.activeTab : ''} 
-            onClick={() => setActiveTab('users')}
-          >
-            User Directory
-          </button>
-          <button 
-            className={activeTab === 'settings' ? styles.activeTab : ''} 
-            onClick={() => setActiveTab('settings')}
-          >
-            Settings
-          </button>
+          <button className={activeTab === 'hierarchy' ? styles.activeTab : ''} onClick={() => setActiveTab('hierarchy')}>Hierarchy</button>
+          <button className={activeTab === 'users' ? styles.activeTab : ''} onClick={() => setActiveTab('users')}>Users</button>
+          <button className={activeTab === 'settings' ? styles.activeTab : ''} onClick={() => setActiveTab('settings')}>Settings</button>
         </div>
       </header>
 
@@ -89,18 +76,59 @@ export const AdminPage: React.FC = () => {
           <div className={styles.tabPane}>
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
-                <Users size={20} />
-                <h2>Organizational Structure</h2>
+                <Building2 size={20} />
+                <h2>Departments</h2>
+                <button className={styles.addBtn} onClick={() => setIsAddingDept(true)}>
+                  <Plus size={16} /> Add Dept
+                </button>
               </div>
-              <div className={styles.orgWrapper}>
-                <Organogram data={organogramData as any} />
+
+              {isAddingDept && (
+                <form onSubmit={handleCreateDept} className={styles.inlineForm}>
+                  <input placeholder="Dept Name" value={newDeptName} onChange={e => setNewDeptName(e.target.value)} required />
+                  <button type="submit">Save</button>
+                  <button type="button" onClick={() => setIsAddingDept(false)}>Cancel</button>
+                </form>
+              )}
+
+              <div className={styles.subunitList}>
+                {departments.map(dept => (
+                  <div key={dept._id} className={styles.subunitCard}>
+                    <div className={styles.cardInfo}>
+                      <strong>{dept.name}</strong>
+                      <div className={styles.assignmentRow}>
+                        <label>Head:</label>
+                        <select 
+                          value={dept.headId || ''} 
+                          onChange={(e) => useMutation(api.departments.updateDepartmentHeads)({ id: dept._id, headId: e.target.value as any })}
+                        >
+                          <option value="">Unassigned</option>
+                          {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
+                        </select>
+                      </div>
+                      <div className={styles.assignmentRow}>
+                        <label>Assistant:</label>
+                        <select 
+                          value={dept.assistantId || ''} 
+                          onChange={(e) => useMutation(api.departments.updateDepartmentHeads)({ id: dept._id, assistantId: e.target.value as any })}
+                        >
+                          <option value="">Unassigned</option>
+                          {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <button onClick={() => deleteDept({ id: dept._id })} className={styles.deleteBtn}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
               </div>
             </section>
 
             <section className={styles.section}>
               <div className={styles.sectionHeader}>
-                <Building2 size={20} />
-                <h2>Manage Units</h2>
+                <Users size={20} />
+                <h2>Subunits</h2>
                 <button 
                   className={styles.addBtn}
                   onClick={() => setIsAddingSubunit(true)}
@@ -118,16 +146,14 @@ export const AdminPage: React.FC = () => {
                     required
                   />
                   <select 
-                    value={newSubunit.department}
-                    onChange={e => setNewSubunit({...newSubunit, department: e.target.value})}
+                    value={newSubunit.departmentId}
+                    onChange={e => setNewSubunit({...newSubunit, departmentId: e.target.value as any})}
                     required
                   >
                     <option value="">Select Department</option>
-                    <option value="Media">Media</option>
-                    <option value="Protocols">Protocols</option>
-                    <option value="Welfare">Welfare</option>
-                    <option value="Ushers">Ushers</option>
-                    <option value="Creative">Creative</option>
+                    {departments.map(dept => (
+                      <option key={dept._id} value={dept._id}>{dept.name}</option>
+                    ))}
                   </select>
                   <button type="submit">Save</button>
                   <button type="button" onClick={() => setIsAddingSubunit(false)}>Cancel</button>
@@ -136,12 +162,34 @@ export const AdminPage: React.FC = () => {
 
               <div className={styles.subunitList}>
                 {subunits.map(sub => (
-                  <div key={sub._id} className={styles.subunitItem}>
-                    <div>
-                      <strong>{sub.name}</strong>
-                      <span>({sub.department})</span>
+                  <div key={sub._id} className={styles.subunitCard}>
+                    <div className={styles.cardInfo}>
+                      <div>
+                        <strong>{sub.name}</strong>
+                        <span className={styles.deptBadge}>{sub.departmentName}</span>
+                      </div>
+                      <div className={styles.assignmentRow}>
+                        <label>Lead:</label>
+                        <select 
+                          value={sub.leadId || ''} 
+                          onChange={(e) => useMutation(api.subunits.updateSubunit)({ id: sub._id, leadId: e.target.value as any })}
+                        >
+                          <option value="">Unassigned</option>
+                          {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
+                        </select>
+                      </div>
+                      <div className={styles.assignmentRow}>
+                        <label>Assistant:</label>
+                        <select 
+                          value={sub.assistantId || ''} 
+                          onChange={(e) => useMutation(api.subunits.updateSubunit)({ id: sub._id, assistantId: e.target.value as any })}
+                        >
+                          <option value="">Unassigned</option>
+                          {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
+                        </select>
+                      </div>
                     </div>
-                    <button onClick={() => handleDeleteSubunit(sub._id)} className={styles.deleteBtn}>
+                    <button onClick={() => deleteSubunit({ id: sub._id })} className={styles.deleteBtn}>
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -179,7 +227,9 @@ export const AdminPage: React.FC = () => {
                             className={styles.roleSelect}
                           >
                             <option value="Volunteer">Volunteer</option>
+                            <option value="SubunitAssistant">Subunit Assistant</option>
                             <option value="SubunitLead">Subunit Lead</option>
+                            <option value="DepartmentAssistant">Dept. Assistant</option>
                             <option value="DepartmentHead">Department Head</option>
                             <option value="PastoralOversight">Pastoral Oversight</option>
                             <option value="SuperAdmin">Super Admin</option>

@@ -38,6 +38,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
   const navigate = useNavigate();
   const me = useQuery(api.users.me);
   const stats = useQuery(api.churches.getChurchStats);
+  const organogramData = useQuery(api.churches.getOrganogram);
   const activities = useQuery(api.churches.getRecentActivities);
   
   const ensureChannels = useMutation(api.chat.ensureChannels);
@@ -131,9 +132,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
               <Users size={20} />
               <h2>Organization Structure</h2>
             </div>
-            <div className="flex items-center justify-center p-12 text-gray-400 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-              Set up your departments and subunits to view the organogram.
-            </div>
+            {organogramData ? (
+              <div className={styles.orgWrapper}>
+                <Organogram data={organogramData as any} />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center p-12 text-gray-400 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                Set up your departments and subunits to view the organogram.
+              </div>
+            )}
           </div>
         )}
 

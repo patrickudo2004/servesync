@@ -12,54 +12,77 @@ export const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onScan, is
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [location, setLocation] = useState<GeolocationPosition | null>(null);
+  const [isCameraEnabled, setIsCameraEnabled] = useState<boolean>(true);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const locationRef = useRef<GeolocationPosition | null>(null);
+
+  // Update locationRef whenever location changes
+  useEffect(() => {
+    locationRef.current = location;
+  }, [location]);
 
   useEffect(() => {
-    // 1. Initialize Scanner IMMEDIATELY
-    scannerRef.current = new Html5QrcodeScanner(
-      "qr-reader",
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      /* verbose= */ false
-    );
-
-    scannerRef.current.render(
-      async (decodedText) => {
-        // Block scanning logic if processing or no location, 
-        // but feed remains visible
-        if (isProcessing) return;
-        if (!location) {
-          setError("GPS Location is required before you can scan.");
-          return;
-        }
-        
-        try {
-          setError(null);
-          await onScan(decodedText, location);
-          setSuccess(true);
-          scannerRef.current?.clear();
-        } catch (err: any) {
-          setError(err.message || "Failed to mark attendance");
-        }
-      },
-      (errorMessage) => {
-        // quiet error
+    if (!isCameraEnabled) {
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+        scannerRef.current = null;
       }
-    );
+      return;
+    }
 
-    // 2. Request Location in parallel
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => setLocation(pos),
-        (err) => setError("Location access is required for attendance verification.")
-      );
-    } else {
-      setError("Geolocation is not supported by your browser.");
+    // Initialize scanner only if it doesn't exist
+    if (!scannerRef.current) {
+      try {
+        scannerRef.current = new Html5QrcodeScanner(
+          "qr-reader",
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          /* verbose= */ false
+        );
+
+        scannerRef.current.render(
+          async (decodedText) => {
+            if (isProcessing) return;
+            if (!locationRef.current) {
+              setError("GPS Location is required before you can scan.");
+              return;
+            }
+            
+            try {
+              setError(null);
+              await onScan(decodedText, locationRef.current);
+              setSuccess(true);
+              setIsCameraEnabled(false); // Turn off camera on success
+              scannerRef.current?.clear();
+              scannerRef.current = null;
+            } catch (err: any) {
+              setError(err.message || "Failed to mark attendance");
+            }
+          },
+          () => {}
+        );
+      } catch (err) {
+        console.error("Scanner failed to init", err);
+      }
     }
 
     return () => {
-      scannerRef.current?.clear().catch(console.error);
+      // Don't clear here to avoid flickering on prop changes
     };
-  }, [onScan, isProcessing, location]);
+  }, [onScan, isProcessing, isCameraEnabled]);
+
+  useEffect(() => {
+    // Single effect for location tracking
+    if (navigator.geolocation) {
+      const watchId = navigator.geolocation.watchPosition(
+        (pos) => setLocation(pos),
+        (err) => setError("Location access is required for attendance verification."),
+        { enableHighAccuracy: true }
+      );
+      return () => navigator.geolocation.clearWatch(watchId);
+    } else {
+      setError("Geolocation is not supported by your browser.");
+    }
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -91,6 +114,15 @@ export const AttendanceScanner: React.FC<AttendanceScannerProps> = ({ onScan, is
       )}
 
       <div id="qr-reader" className={styles.reader}></div>
+
+      <div className={styles.controls}>
+        <button 
+          onClick={() => setIsCameraEnabled(!isCameraEnabled)}
+          className={isCameraEnabled ? styles.stopBtn : styles.startBtn}
+        >
+          {isCameraEnabled ? "Stop Camera" : "Start Camera"}
+        </button>
+      </div>
 
       <div className={styles.footer}>
         <p>Ensure you are within the church premises to check in.</p>

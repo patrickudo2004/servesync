@@ -17,17 +17,12 @@ export const createInvite = mutation({
   args: {
     email: v.string(),
     role: v.string(),
-    department: v.optional(v.string()),
-    subunit: v.optional(v.string()),
+    departmentId: v.optional(v.id("departments")),
+    subunitId: v.optional(v.id("subunits")),
   },
   handler: async (ctx, args) => {
     const user = await checkRole(ctx, ["SuperAdmin", "DepartmentHead"]);
     
-    // DeptHead can only invite to their own department
-    if (user.role === "DepartmentHead" && args.department !== user.department) {
-      throw new Error("You can only invite to your own department");
-    }
-
     const token = Math.random().toString(36).substring(2, 15);
     const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -36,14 +31,13 @@ export const createInvite = mutation({
       churchId: user.churchId!,
       invitedBy: user._id,
       role: args.role,
-      department: args.department,
-      subunit: args.subunit,
+      departmentId: args.departmentId,
+      subunitId: args.subunitId,
       token,
       expiresAt,
       status: "pending",
     });
 
-    // In a real app, trigger an email action here
     return inviteId;
   },
 });
@@ -98,8 +92,8 @@ export const acceptInvite = mutation({
     await ctx.db.patch(userId, {
       churchId: invite.churchId,
       role: invite.role as any,
-      department: invite.department,
-      subunit: invite.subunit,
+      departmentId: invite.departmentId,
+      subunitId: invite.subunitId,
     });
 
     await ctx.db.patch(invite._id, { status: "accepted" });

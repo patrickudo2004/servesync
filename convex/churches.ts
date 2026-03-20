@@ -191,32 +191,39 @@ export const getOrganogram = query({
       .withIndex("by_church", (q) => q.eq("churchId", user.churchId))
       .collect();
 
+    const depts = await ctx.db
+      .query("departments")
+      .withIndex("by_church", (q) => q.eq("churchId", user.churchId))
+      .collect();
+
     const subunits = await ctx.db
       .query("subunits")
       .withIndex("by_church", (q) => q.eq("churchId", user.churchId))
       .collect();
-
-    const depts = new Set(subunits.map(s => s.department));
     
     return {
       id: church._id,
       name: church.name,
       role: "SuperAdmin" as const,
-      children: Array.from(depts).map(deptName => ({
-        id: deptName,
-        name: deptName,
+      children: depts.map(dept => ({
+        id: dept._id,
+        name: dept.name,
         role: "DepartmentHead" as const,
+        headId: dept.headId,
+        assistantId: dept.assistantId,
         children: subunits
-          .filter(s => s.department === deptName)
+          .filter(s => s.departmentId === dept._id)
           .map(s => ({
             id: s._id,
             name: s.name,
             role: "SubunitLead" as const,
+            headId: s.leadId,
+            assistantId: s.assistantId,
             children: allUsers
-              .filter(u => u.subunit === s._id)
+              .filter(u => u.subunitId === s._id)
               .map(u => ({
                 id: u._id,
-                name: u.name || "Unknown Volunteer",
+                name: u.name || u.email || "Unknown Volunteer",
                 role: u.role as any,
               }))
           }))

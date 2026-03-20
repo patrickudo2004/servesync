@@ -9,28 +9,37 @@ export const getSubunits = query({
     const user = await ctx.db.get(userId);
     if (!user?.churchId) return [];
 
-    return await ctx.db
+    const subunits = await ctx.db
       .query("subunits")
       .withIndex("by_church", (q) => q.eq("churchId", user.churchId))
       .collect();
+
+    // Map subunits to include department name for easier UI usage
+    return Promise.all(subunits.map(async (s) => {
+      const dept = await ctx.db.get(s.departmentId);
+      return {
+        ...s,
+        departmentName: dept?.name || "Unknown Department",
+      };
+    }));
   },
 });
 
 export const createSubunit = mutation({
   args: {
     name: v.string(),
-    department: v.string(),
+    departmentId: v.id("departments"),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
     const user = await ctx.db.get(userId);
-    if (!user?.churchId) throw new Error("User has no church");
+    if (user?.role !== "SuperAdmin") throw new Error("Unauthorized");
 
     return await ctx.db.insert("subunits", {
-      churchId: user.churchId,
+      churchId: user.churchId!,
       name: args.name,
-      department: args.department,
+      departmentId: args.departmentId,
     });
   },
 });

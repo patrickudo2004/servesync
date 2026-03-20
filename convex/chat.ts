@@ -26,14 +26,14 @@ export const getChannels = query({
       if (user.role === "SuperAdmin") return true;
       
       if (channel.type === "department") {
-        return channel.department === user.department;
+        return channel.departmentId === user.departmentId;
       }
       
       if (channel.type === "subunit") {
         return (
-          channel.department === user.department &&
-          (channel.subunit === user.subunit || 
-           user.additionalSubunits?.includes(channel.subunit!))
+          channel.departmentId === user.departmentId &&
+          (channel.subunitId === user.subunitId || 
+           user.additionalSubunits?.includes(channel.subunitId as any))
         );
       }
       
@@ -226,24 +226,26 @@ export const ensureChannels = mutation({
     }
 
     // 2. User's Department
-    if (user.department && !existing.find(c => c.type === "department" && c.department === user.department)) {
+    if (user.departmentId && !existing.find(c => c.type === "department" && c.departmentId === user.departmentId)) {
+      const dept = await ctx.db.get(user.departmentId);
       await ctx.db.insert("channels", {
         churchId: args.churchId,
         type: "department",
-        department: user.department,
-        name: `${user.department} Department`,
+        departmentId: user.departmentId,
+        name: `${dept?.name || "Department"} Chat`,
         isDisabled: false,
       });
     }
 
     // 3. User's Subunit
-    if (user.department && user.subunit && !existing.find(c => c.type === "subunit" && c.subunit === user.subunit)) {
+    if (user.subunitId && !existing.find(c => c.type === "subunit" && c.subunitId === user.subunitId)) {
+      const sub = await ctx.db.get(user.subunitId);
       await ctx.db.insert("channels", {
         churchId: args.churchId,
         type: "subunit",
-        department: user.department,
-        subunit: user.subunit,
-        name: `${user.subunit} Subunit`,
+        departmentId: user.departmentId,
+        subunitId: user.subunitId,
+        name: `${sub?.name || "Subunit"} Chat`,
         isDisabled: false,
       });
     }

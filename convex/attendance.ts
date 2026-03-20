@@ -40,9 +40,13 @@ export const markAttendance = mutation({
     if (!church) throw new Error("Church not found");
 
     // 1. Verify QR Secret
-    if (service.qrCodeSecret !== args.qrSecret) {
-      throw new Error("Invalid or expired QR code");
+    // If service has a specific secret, it MUST match.
+    if (service.qrCodeSecret && service.qrCodeSecret !== args.qrSecret) {
+      throw new Error("Invalid or expired QR code for this specific service");
     }
+    
+    // Fallback for older services or generic codes if we decide to keep them
+    // For now, we enforce the one in the service record.
 
     // 2. Verify Time Window (e.g. 30 mins before start to 30 mins after end)
     const now = Date.now();

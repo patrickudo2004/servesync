@@ -133,3 +133,11 @@
 .activityAction {
   color: #9ca3af;
 }
+
+.orgWrapper {
+  background: white;
+  border-radius: 16px;
+  padding: 1rem;
+  overflow-x: auto;
+  min-height: 400px;
+}
