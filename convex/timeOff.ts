@@ -1,0 +1,74 @@
+import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
+import { auth } from "./auth";
+
+export const createRequest = mutation({
+  args: {
+    startDate: v.number(),
+    endDate: v.number(),
+    reason: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) throw new Error("Church not found");
+
+    return await ctx.db.insert("timeOffRequests", {
+      userId,
+      churchId: user.churchId,
+      startDate: args.startDate,
+      endDate: args.endDate,
+      reason: args.reason,
+      status: "Pending",
+    });
+  },
+});
+
+export const getRequests = query({
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) return [];
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) return [];
+
+    const requests = await ctx.db
+      .query("timeOffRequests")
+      .withIndex("by_church", (q) => q.eq("churchId", user.churchId!))
+      .order("desc")
+      .collect();
+
+    return Promise.all(requests.map(async (req) => {
+      const requester = await ctx.db.get(req.userId);
+      return {
+        ...req,
+        userName: requester?.name || requester?.email || "Unknown",
+        userRole: requester?.role || "Volunteer",
+      };
+    }));
+  },
+});
+
+export const updateRequestStatus = mutation({
+  args: {
+    id: v.id("timeOffRequests"),
+    status: v.union(v.literal("Approved"), v.literal("Rejected")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    
+    // Check if user has permission (SuperAdmin, DeptHead, or SubunitLead)
+    const allowedRoles = ["SuperAdmin", "DepartmentHead", "SubunitLead"];
+    if (!user?.role || !allowedRoles.includes(user.role)) {
+      throw new Error("Unauthorized to review time off requests");
+    }
+
+    await ctx.db.patch(args.id, {
+      status: args.status,
+      reviewedBy: userId,
+      reviewedAt: Date.now(),
+    });
+  },
+});

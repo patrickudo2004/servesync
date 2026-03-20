@@ -263,4 +263,17 @@ export default defineSchema({
     redeemedAt: v.number(),
   }).index("by_user", ["userId"])
     .index("by_church", ["churchId"]),
+
+  timeOffRequests: defineTable({
+    userId: v.id("users"),
+    churchId: v.id("churches"),
+    startDate: v.number(),
+    endDate: v.number(),
+    reason: v.string(),
+    status: v.union(v.literal("Pending"), v.literal("Approved"), v.literal("Rejected")),
+    reviewedBy: v.optional(v.id("users")),
+    reviewedAt: v.optional(v.number()),
+  }).index("by_user", ["userId"])
+    .index("by_church", ["churchId"])
+    .index("by_church_status", ["churchId", "status"]),
 });
