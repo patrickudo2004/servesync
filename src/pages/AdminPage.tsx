@@ -23,6 +23,17 @@ export const AdminPage: React.FC = () => {
   const [isAddingSubunit, setIsAddingSubunit] = useState(false);
   const [newSubunit, setNewSubunit] = useState({ name: '', departmentId: '' as any });
 
+  const updateDeptHeads = useMutation(api.departments.updateDepartmentHeads);
+  const updateSubunitMutation = useMutation(api.subunits.updateSubunit);
+
+  const handleRoleChange = async (userId: any, role: string) => {
+    try {
+      await updateUserRole({ userId, role: role as any });
+    } catch (err) {
+      alert("Failed to update user role. Only SuperAdmins can do this.");
+    }
+  };
+
   const handleCreateDept = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -31,6 +42,14 @@ export const AdminPage: React.FC = () => {
       setIsAddingDept(false);
     } catch (err) {
       alert("Failed to create department");
+    }
+  };
+
+  const handleDeleteDept = async (id: any) => {
+    try {
+      await deleteDept({ id });
+    } catch (err: any) {
+      alert(err.message || "Failed to delete department. Ensure it has no active subunits.");
     }
   };
 
@@ -100,7 +119,7 @@ export const AdminPage: React.FC = () => {
                         <label>Head:</label>
                         <select 
                           value={dept.headId || ''} 
-                          onChange={(e) => useMutation(api.departments.updateDepartmentHeads)({ id: dept._id, headId: e.target.value as any })}
+                          onChange={(e) => updateDeptHeads({ id: dept._id, headId: e.target.value as any })}
                         >
                           <option value="">Unassigned</option>
                           {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
@@ -110,14 +129,14 @@ export const AdminPage: React.FC = () => {
                         <label>Assistant:</label>
                         <select 
                           value={dept.assistantId || ''} 
-                          onChange={(e) => useMutation(api.departments.updateDepartmentHeads)({ id: dept._id, assistantId: e.target.value as any })}
+                          onChange={(e) => updateDeptHeads({ id: dept._id, assistantId: e.target.value as any })}
                         >
                           <option value="">Unassigned</option>
                           {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
                         </select>
                       </div>
                     </div>
-                    <button onClick={() => deleteDept({ id: dept._id })} className={styles.deleteBtn}>
+                    <button onClick={() => handleDeleteDept(dept._id)} className={styles.deleteBtn}>
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -172,7 +191,7 @@ export const AdminPage: React.FC = () => {
                         <label>Lead:</label>
                         <select 
                           value={sub.leadId || ''} 
-                          onChange={(e) => useMutation(api.subunits.updateSubunit)({ id: sub._id, leadId: e.target.value as any })}
+                          onChange={(e) => updateSubunitMutation({ id: sub._id, leadId: e.target.value as any })}
                         >
                           <option value="">Unassigned</option>
                           {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
@@ -182,7 +201,7 @@ export const AdminPage: React.FC = () => {
                         <label>Assistant:</label>
                         <select 
                           value={sub.assistantId || ''} 
-                          onChange={(e) => useMutation(api.subunits.updateSubunit)({ id: sub._id, assistantId: e.target.value as any })}
+                          onChange={(e) => updateSubunitMutation({ id: sub._id, assistantId: e.target.value as any })}
                         >
                           <option value="">Unassigned</option>
                           {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
@@ -235,7 +254,7 @@ export const AdminPage: React.FC = () => {
                             <option value="SuperAdmin">Super Admin</option>
                           </select>
                         </td>
-                        <td>{user.department} / {user.subunit}</td>
+                        <td>{user.departmentName} / {user.subunitName}</td>
                         <td>
                           <button className={styles.iconBtn}><ChevronRight size={16} /></button>
                         </td>
