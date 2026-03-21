@@ -266,3 +266,75 @@
   font-size: 0.75rem;
   color: var(--text-secondary);
 }
+
+.logoUploadArea {
+  margin-top: 0.5rem;
+}
+
+.logoPreview {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: white;
+}
+
+.logoPreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.changeLogoBtn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  color: white;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.logoPreview:hover .changeLogoBtn {
+  opacity: 1;
+}
+
+.uploadPlaceholder {
+  width: 120px;
+  height: 120px;
+  border: 2px dashed var(--border-color);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.uploadPlaceholder:hover {
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.uploadPlaceholder span {
+  font-size: 0.75rem;
+  font-weight: 600;
+}

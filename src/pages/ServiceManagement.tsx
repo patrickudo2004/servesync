@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Calendar, Plus, QrCode, Clock, MapPin, Loader2, X, Printer } from 'lucide-react';
+import { format } from 'date-fns';
 import { AttendanceTicket } from '../components/AttendanceTicket';
 import styles from './ServiceManagement.module.css';
 

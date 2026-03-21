@@ -13,7 +13,9 @@ import {
   UserCheck,
   Palette,
   Layers,
-  Info
+  Info,
+  Upload,
+  Trash2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import styles from './AdminSettings.module.css';
@@ -28,9 +30,14 @@ export const AdminSettings: React.FC = () => {
   const navigate = useNavigate();
   const church = useQuery(api.churches.getMyChurch);
   const updateSettings = useMutation(api.churches.updateExtendedSettings);
+  const generateUploadUrl = useMutation(api.churches.generateLogoUploadUrl);
+  const updateLogo = useMutation(api.churches.updateLogo);
   
   const [activeTab, setActiveTab] = useState<'general' | 'geofence' | 'rules'>('general');
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [formData, setFormData] = useState({
     attendanceWindowMinutes: 30,
     geofenceRadius: 100,
@@ -127,6 +134,29 @@ export const AdminSettings: React.FC = () => {
     return unit === 'miles' ? val * 1609.34 : val;
   }
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const postUrl = await generateUploadUrl();
+      const result = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const { storageId } = await result.json();
+      await updateLogo({ storageId });
+      alert('Logo updated successfully!');
+    } catch (err: any) {
+      alert('Failed to upload logo: ' + err.message);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -190,7 +220,46 @@ export const AdminSettings: React.FC = () => {
         {activeTab === 'general' && (
           <div className={styles.panel}>
             <section className={styles.section}>
-              <h3><Layers size={20} /> App Appearance</h3>
+              <h3><Palette size={20} /> Church Branding</h3>
+              
+              <div className={styles.field}>
+                <label>Church Logo</label>
+                <div className={styles.logoUploadArea}>
+                  {church.logoUrl ? (
+                    <div className={styles.logoPreview}>
+                      <img src={church.logoUrl} alt="Church Logo" />
+                      <button 
+                        className={styles.changeLogoBtn}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload size={16} /> Change Logo
+                      </button>
+                    </div>
+                  ) : (
+                    <div 
+                      className={styles.uploadPlaceholder}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {isUploading ? (
+                        <Loader2 className="animate-spin" size={32} />
+                      ) : (
+                        <>
+                          <Upload size={32} />
+                          <span>Click to upload logo</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  <input 
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleLogoUpload}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                  />
+                </div>
+              </div>
+
               <div className={styles.field}>
                 <label>Accent Color</label>
                 <div className={styles.colorPicker}>

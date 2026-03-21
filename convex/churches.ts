@@ -96,6 +96,34 @@ export const initializeQrSecret = mutation({
   }
 });
 
+export const generateLogoUploadUrl = mutation({
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const updateLogo = mutation({
+  args: {
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId || user.role !== "SuperAdmin") throw new Error("Unauthorized");
+
+    const logoUrl = await ctx.storage.getUrl(args.storageId);
+    if (!logoUrl) throw new Error("Failed to get URL for logo");
+
+    await ctx.db.patch(user.churchId, {
+      logoStorageId: args.storageId,
+      logoUrl: logoUrl,
+    });
+  },
+});
+
 export const updateSettings = mutation({
   args: {
     attendanceWindowMinutes: v.optional(v.number()),
