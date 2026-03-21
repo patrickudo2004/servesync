@@ -228,24 +228,113 @@
   padding: 1rem;
 }
 
-.toolCard {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.settingsGrid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
 }
 
-.secondaryBtn {
+.settingsForm {
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.labelWithIcon {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.field input[type="number"], .field select {
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 0.95rem;
   background: var(--bg-secondary);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  padding: 0.75rem;
-  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+.checkboxField {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--bg-secondary);
+  border-radius: 16px;
+}
+
+.saveBtn {
+  margin-top: 2.5rem;
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 14px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saveBtn:hover {
+  background: #7c3aed;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+}
+
+.settingsSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.infoCard {
+  background: #eff6ff;
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 1px solid #dbeafe;
+}
+
+.infoCard h3 {
+  font-size: 1rem;
+  color: #1e40af;
+  margin: 0 0 0.5rem 0;
+}
+
+.infoCard p {
+  font-size: 0.875rem;
+  color: #1e3a8a;
+  line-height: 1.6;
+  margin: 0;
 }
 
 .iconBtn {
@@ -254,4 +343,10 @@
   color: var(--text-secondary);
   cursor: pointer;
   padding: 0.5rem;
+}
+
+@media (max-width: 1100px) {
+  .settingsGrid {
+    grid-template-columns: 1fr;
+  }
 }

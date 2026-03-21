@@ -23,13 +23,16 @@ export const createService = mutation({
     name: v.string(),
     startTime: v.number(),
     endTime: v.number(),
-    qrType: v.union(v.literal("Unique"), v.literal("Generic")),
+    qrType: v.optional(v.union(v.literal("Unique"), v.literal("Generic"))),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
     const user = await ctx.db.get(userId);
     if (!user?.churchId) throw new Error("Church not found");
+
+    const church = await ctx.db.get(user.churchId);
+    const resolvedQrType = args.qrType || church?.settings?.defaultQrType || "Unique";
 
     // Generate a secure secret for QR code
     const qrCodeSecret = Math.random().toString(36).substring(2, 15) + 
@@ -41,7 +44,7 @@ export const createService = mutation({
       startTime: args.startTime,
       endTime: args.endTime,
       qrCodeSecret,
-      qrType: args.qrType,
+      qrType: resolvedQrType,
     });
   },
 });

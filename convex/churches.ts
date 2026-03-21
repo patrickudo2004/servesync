@@ -70,6 +70,7 @@ export const updateSettings = mutation({
     attendanceWindowMinutes: v.optional(v.number()),
     geofenceRadius: v.optional(v.number()),
     requireLeadApprovalForSwaps: v.optional(v.boolean()),
+    defaultQrType: v.optional(v.union(v.literal("Unique"), v.literal("Generic"))),
     location: v.optional(v.object({
       lat: v.number(),
       lng: v.number(),

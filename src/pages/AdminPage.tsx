@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Organogram } from '../components/Organogram';
+import { AdminSettings } from '../components/AdminSettings';
 import { Users, Mail, Settings, Shield, Loader2, Plus, Trash2, UserCog, ChevronRight, Building2 } from 'lucide-react';
 import styles from './AdminPage.module.css';
 
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'hierarchy' | 'users' | 'settings'>('hierarchy');
+  const activeUser = useQuery(api.users.getMe);
+  const myChurch = useQuery(api.churches.getMyChurch);
   const organogramData = useQuery(api.churches.getOrganogram);
   const departments = useQuery(api.departments.getDepartments);
   const subunits = useQuery(api.subunits.getSubunits);
@@ -269,12 +272,13 @@ export const AdminPage: React.FC = () => {
 
         {activeTab === 'settings' && (
           <div className={styles.tabPane}>
-             <div className={styles.toolCard}>
-              <Settings size={20} />
-              <h3>Church Settings</h3>
-              <p>Configure geofencing, time windows, and PWA options.</p>
-              <button className={styles.secondaryBtn}>Configure</button>
-            </div>
+            {myChurch ? (
+              <AdminSettings church={myChurch as any} />
+            ) : (
+              <div className="flex justify-center p-12">
+                <Loader2 className="animate-spin text-purple-600" />
+              </div>
+            )}
           </div>
         )}
       </div>

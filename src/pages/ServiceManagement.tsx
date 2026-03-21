@@ -6,6 +6,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import styles from './ServiceManagement.module.css';
 
 export const ServiceManagement: React.FC = () => {
+  const church = useQuery(api.churches.getMyChurch);
   const services = useQuery(api.services.getChurchServices);
   const createService = useMutation(api.services.createService);
   
@@ -15,8 +16,16 @@ export const ServiceManagement: React.FC = () => {
     name: '',
     date: '',
     startTime: '09:00',
-    endTime: '11:00'
+    endTime: '11:00',
+    qrType: 'Unique' as 'Unique' | 'Generic'
   });
+
+  // Set default qrType when modal opens if church settings exist
+  React.useEffect(() => {
+    if (isAdding && church?.settings?.defaultQrType) {
+      setFormData(prev => ({ ...prev, qrType: church.settings!.defaultQrType! }));
+    }
+  }, [isAdding, church]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,16 +36,27 @@ export const ServiceManagement: React.FC = () => {
       await createService({
         name: formData.name,
         startTime: start,
-        endTime: end
+        endTime: end,
+        qrType: formData.qrType
       });
       setIsAdding(false);
-      setFormData({ name: '', date: '', startTime: '09:00', endTime: '11:00' });
+      setFormData({ 
+        name: '', 
+        date: '', 
+        startTime: '09:00', 
+        endTime: '11:00', 
+        qrType: church?.settings?.defaultQrType || 'Unique' 
+      });
     } catch (err) {
-      alert("Failed to create service");
+      alert("Failed to create service. Please ensure all fields are correct.");
     }
   };
 
-  if (services === undefined) {
+  const handlePrint = () => {
+    window.print();
+  };
+
+  if (services === undefined || church === undefined) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="animate-spin text-purple-600" size={32} />
@@ -84,6 +104,10 @@ export const ServiceManagement: React.FC = () => {
                       {new Date(service.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
                       {new Date(service.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
+                  </div>
+                  <div className={styles.typeTag}>
+                    <QrCode size={12} />
+                    {service.qrType} Code
                   </div>
                 </div>
               </div>
@@ -145,36 +169,74 @@ export const ServiceManagement: React.FC = () => {
                   />
                 </div>
               </div>
+              
+              <div className={styles.field}>
+                <label>QR Code Security</label>
+                <select 
+                  value={formData.qrType}
+                  onChange={e => setFormData({...formData, qrType: e.target.value as any})}
+                >
+                  <option value="Unique">Unique (Recommended - Most Secure)</option>
+                  <option value="Generic">Generic (Fixed code)</option>
+                </select>
+                <p className={styles.hint}>Unique codes change per service to prevent attendance fraud.</p>
+              </div>
+
               <button type="submit" className={styles.submitBtn}>Create Service</button>
             </form>
           </div>
         </div>
       )}
 
-      {/* QR Modal */}
+      {/* QR Modal & Printable View */}
       {selectedService && (
         <div className={styles.modalOverlay}>
           <div className={styles.qrModal}>
-            <div className={styles.modalHeader}>
+            <div className={`${styles.modalHeader} no-print`}>
               <h2>Attendance QR Code</h2>
               <button onClick={() => setSelectedService(null)}><X size={20} /></button>
             </div>
-            <div className={styles.qrContent}>
-              <div className={styles.qrWrapper}>
-                <QRCodeCanvas 
-                  value={JSON.stringify({
-                    serviceId: selectedService._id,
-                    secret: selectedService.qrCodeSecret
-                  })}
-                  size={256}
-                  level="H"
-                  includeMargin={true}
-                />
+            
+            <div className={styles.printableArea}>
+              <div className={styles.printHeader}>
+                <h2>{church.name}</h2>
+                <p>Attendance Pass</p>
               </div>
-              <h3>{selectedService.name}</h3>
-              <p>Display this code at the church entrance for volunteers to scan.</p>
+
+              <div className={styles.qrContent}>
+                <div className={styles.qrWrapper}>
+                  <QRCodeCanvas 
+                    value={JSON.stringify({
+                      serviceId: selectedService._id,
+                      secret: selectedService.qrCodeSecret
+                    })}
+                    size={300}
+                    level="H"
+                    includeMargin={true}
+                  />
+                </div>
+                <div className={styles.printDetails}>
+                  <h3>{selectedService.name}</h3>
+                  <div className={styles.printMeta}>
+                    <p>{new Date(selectedService.startTime).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <p>
+                      {new Date(selectedService.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                      {new Date(selectedService.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.printFooter}>
+                <p>Please present this code to a volunteer Lead for check-in.</p>
+                <small>Generated by ServeSync</small>
+              </div>
             </div>
-            <button className={styles.printBtn} onClick={() => window.print()}>Print Code</button>
+
+            <div className={`${styles.modalFooter} no-print`}>
+               <button className={styles.printBtn} onClick={handlePrint}>Print Code</button>
+               <p className={styles.hint}>This will print a high-quality ID card with the QR code.</p>
+            </div>
           </div>
         </div>
       )}
