@@ -6,26 +6,40 @@ import styles from './AttendancePage.module.css';
 
 export const AttendancePage: React.FC = () => {
   const markAttendance = useMutation(api.attendance.markAttendance);
+  const markDailyAttendance = useMutation(api.attendance.markDailyAttendance);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleScan = async (data: string, location: GeolocationPosition) => {
     setIsProcessing(true);
     try {
-      let qrData;
+      let qrData: any;
       try {
         qrData = JSON.parse(data);
       } catch (e) {
-        // Fallback for simple demo IDs if needed, but PRD expects secret
-        qrData = { serviceId: data, secret: "DEMO_SECRET" };
+        // Fallback for raw IDs if they exist
+        qrData = { serviceId: data, secret: "LEGACY" };
       }
 
-      await markAttendance({
-        serviceId: qrData.serviceId as any,
+      const commonArgs = {
         qrSecret: qrData.secret,
         lat: location.coords.latitude,
         lng: location.coords.longitude,
         accuracy: location.coords.accuracy,
-      });
+      };
+
+      if (qrData.type === 'daily' && qrData.churchId) {
+        await markDailyAttendance({
+          churchId: qrData.churchId,
+          ...commonArgs
+        });
+      } else if (qrData.serviceId) {
+        await markAttendance({
+          serviceId: qrData.serviceId,
+          ...commonArgs
+        });
+      } else {
+        throw new Error("Invalid QR Code format");
+      }
     } finally {
       setIsProcessing(false);
     }

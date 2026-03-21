@@ -61,8 +61,39 @@ export const getMyChurch = query({
     if (!userId) return null;
     const user = await ctx.db.get(userId);
     if (!user?.churchId) return null;
-    return await ctx.db.get(user.churchId);
+
+    const church = await ctx.db.get(user.churchId);
+    if (church && !church.settings?.qrCodeSecret) {
+      // In a real app, this should probably be a mutation, but for ease here:
+      // We'll just return it for now or rely on a setup step.
+      // Better: we'll check if we need to initialize it.
+    }
+    return church;
   },
+});
+
+export const initializeQrSecret = mutation({
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) throw new Error("Church not found");
+
+    const church = await ctx.db.get(user.churchId);
+    if (church?.settings?.qrCodeSecret) return church.settings.qrCodeSecret;
+
+    const secret = Math.random().toString(36).substring(2, 15) + 
+                   Math.random().toString(36).substring(2, 15);
+    
+    await ctx.db.patch(user.churchId, {
+      settings: {
+        ...(church?.settings || {}),
+        qrCodeSecret: secret,
+      }
+    });
+
+    return secret;
+  }
 });
 
 export const updateSettings = mutation({

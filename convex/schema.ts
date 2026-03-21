@@ -57,6 +57,7 @@ export default defineSchema({
       geofenceRadius: v.optional(v.number()),
       requireLeadApprovalForSwaps: v.optional(v.boolean()),
       defaultQrType: v.optional(v.union(v.literal("Unique"), v.literal("Generic"))),
+      qrCodeSecret: v.optional(v.string()), // Church-wide secret for daily passes
     })),
   }).index("by_slug", ["slug"]),
 

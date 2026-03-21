@@ -8,7 +8,7 @@ import styles from './AdminPage.module.css';
 
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'hierarchy' | 'users' | 'settings'>('hierarchy');
-  const activeUser = useQuery(api.users.getMe);
+  const activeUser = useQuery(api.users.me);
   const myChurch = useQuery(api.churches.getMyChurch);
   const organogramData = useQuery(api.churches.getOrganogram);
   const departments = useQuery(api.departments.getDepartments);

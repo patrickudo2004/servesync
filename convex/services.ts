@@ -60,3 +60,27 @@ export const deleteService = mutation({
     await ctx.db.delete(args.id);
   },
 });
+
+export const getDailyServices = query({
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) return [];
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) return [];
+
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const endOfDay = startOfDay + 24 * 60 * 60 * 1000;
+
+    return await ctx.db
+      .query("services")
+      .withIndex("by_church", (q) => q.eq("churchId", user.churchId!))
+      .filter((q) => 
+        q.and(
+          q.gte(q.field("startTime"), startOfDay),
+          q.lt(q.field("startTime"), endOfDay)
+        )
+      )
+      .collect();
+  },
+});
