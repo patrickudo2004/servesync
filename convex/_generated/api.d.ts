@@ -24,6 +24,7 @@ import type * as rotas from "../rotas.js";
 import type * as services from "../services.js";
 import type * as shiftSwap from "../shiftSwap.js";
 import type * as subunits from "../subunits.js";
+import type * as timeOff from "../timeOff.js";
 import type * as users from "../users.js";
 
 import type {
@@ -49,6 +50,7 @@ declare const fullApi: ApiFromModules<{
   services: typeof services;
   shiftSwap: typeof shiftSwap;
   subunits: typeof subunits;
+  timeOff: typeof timeOff;
   users: typeof users;
 }>;
 

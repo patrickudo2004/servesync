@@ -1,22 +1,27 @@
 import React, { useState } from 'react';
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Send, Users, Loader2, X, Plus } from 'lucide-react';
+import { Send, Users, Loader2 } from 'lucide-react';
 import styles from './InviteForm.module.css';
 
 interface InviteFormProps {
   userRole: 'SuperAdmin' | 'DepartmentHead';
-  department?: string;
+  defaultDepartmentId?: string;
 }
 
-export const InviteForm: React.FC<InviteFormProps> = ({ userRole, department }) => {
+export const InviteForm: React.FC<InviteFormProps> = ({ userRole, defaultDepartmentId }) => {
   const bulkInvite = useMutation(api.invites.bulkInvite);
+  const departments = useQuery(api.departments.getDepartments);
+  const subunits = useQuery(api.subunits.getSubunits);
   
   const [emailsText, setEmailsText] = useState('');
   const [role, setRole] = useState('Volunteer');
-  const [selectedDept, setSelectedDept] = useState(department || '');
+  const [selectedDeptId, setSelectedDeptId] = useState(defaultDepartmentId || '');
+  const [selectedSubunitId, setSelectedSubunitId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const availableSubunits = subunits?.filter(s => s.departmentId === selectedDeptId) || [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,13 +36,15 @@ export const InviteForm: React.FC<InviteFormProps> = ({ userRole, department }) 
       await bulkInvite({
         emails,
         role,
-        department: selectedDept,
+        departmentId: selectedDeptId as any,
+        subunitId: selectedSubunitId as any,
       });
       setSuccess(true);
       setEmailsText('');
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       console.error(error);
+      alert("Failed to send invites. Check console for details.");
     } finally {
       setIsSubmitting(false);
     }
@@ -51,7 +58,7 @@ export const InviteForm: React.FC<InviteFormProps> = ({ userRole, department }) 
         </div>
         <div>
           <h3>Invite Team Members</h3>
-          <p>Add people to your {selectedDept || 'church'} team.</p>
+          <p>Add people to your team.</p>
         </div>
       </div>
 
@@ -78,21 +85,40 @@ export const InviteForm: React.FC<InviteFormProps> = ({ userRole, department }) 
             </select>
           </div>
 
-          {userRole === 'SuperAdmin' && (
+          <div className={styles.field}>
+            <label>Department</label>
+            <select 
+              value={selectedDeptId} 
+              onChange={(e) => {
+                setSelectedDeptId(e.target.value);
+                setSelectedSubunitId('');
+              }} 
+              required
+            >
+              <option value="">Select Department...</option>
+              {departments?.map(d => (
+                <option key={d._id} value={d._id}>{d.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {availableSubunits.length > 0 && (
             <div className={styles.field}>
-              <label>Department</label>
-              <select value={selectedDept} onChange={(e) => setSelectedDept(e.target.value)} required>
-                <option value="">Select Department...</option>
-                <option value="Music">Music</option>
-                <option value="Media">Media</option>
-                <option value="Ushering">Ushering</option>
-                <option value="Kids">Kids</option>
+              <label>Subunit</label>
+              <select 
+                value={selectedSubunitId} 
+                onChange={(e) => setSelectedSubunitId(e.target.value)}
+              >
+                <option value="">Select Subunit (Optional)...</option>
+                {availableSubunits.map(s => (
+                  <option key={s._id} value={s._id}>{s.name}</option>
+                ))}
               </select>
             </div>
           )}
         </div>
 
-        <button type="submit" className={styles.submitBtn} disabled={isSubmitting || !emailsText}>
+        <button type="submit" className={styles.submitBtn} disabled={isSubmitting || !emailsText || !selectedDeptId}>
           {isSubmitting ? <Loader2 className={styles.spinner} /> : (
             <>{success ? "Invites Sent!" : "Send Invites"} <Send size={18} /></>
           )}

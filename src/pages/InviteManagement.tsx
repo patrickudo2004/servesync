@@ -18,7 +18,7 @@ export const InviteManagement: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.sidebar}>
-        <InviteForm userRole={me.role as any} department={me.department} />
+        <InviteForm userRole={me.role as any} defaultDepartmentId={me.departmentId} />
       </div>
 
       <div className={styles.main}>
@@ -40,7 +40,7 @@ export const InviteManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {invites?.map((invite) => (
+              {invites?.map((invite: any) => (
                 <tr key={invite._id}>
                   <td>
                     <div className={styles.emailCell}>
@@ -51,8 +51,8 @@ export const InviteManagement: React.FC = () => {
                   <td><RoleBadge role={invite.role as any} /></td>
                   <td>
                     <span className={styles.deptText}>
-                      {invite.department || '—'}
-                      {invite.subunit && ` / ${invite.subunit}`}
+                      {invite.departmentName || '—'}
+                      {invite.subunitName && ` / ${invite.subunitName}`}
                     </span>
                   </td>
                   <td>

@@ -46,8 +46,8 @@ export const bulkInvite = mutation({
   args: {
     emails: v.array(v.string()),
     role: v.string(),
-    department: v.optional(v.string()),
-    subunit: v.optional(v.string()),
+    departmentId: v.optional(v.id("departments")),
+    subunitId: v.optional(v.id("subunits")),
   },
   handler: async (ctx, args) => {
     const user = await checkRole(ctx, ["SuperAdmin", "DepartmentHead"]);
@@ -59,8 +59,8 @@ export const bulkInvite = mutation({
         churchId: user.churchId!,
         invitedBy: user._id,
         role: args.role,
-        department: args.department,
-        subunit: args.subunit,
+        departmentId: args.departmentId,
+        subunitId: args.subunitId,
         token,
         expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
         status: "pending",
@@ -141,9 +141,19 @@ export const revokeInvite = mutation({
 export const getInvites = query({
   handler: async (ctx) => {
     const user = await checkRole(ctx, ["SuperAdmin", "DepartmentHead"]);
-    return await ctx.db
+    const invites = await ctx.db
       .query("invites")
       .filter((q) => q.eq(q.field("churchId"), user.churchId))
       .collect();
+
+    return Promise.all(invites.map(async (invite) => {
+      const dept = invite.departmentId ? await ctx.db.get(invite.departmentId) : null;
+      const sub = invite.subunitId ? await ctx.db.get(invite.subunitId) : null;
+      return {
+        ...invite,
+        departmentName: dept?.name,
+        subunitName: sub?.name,
+      };
+    }));
   },
 });
