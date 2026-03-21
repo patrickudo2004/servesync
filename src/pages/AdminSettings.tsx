@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { 
@@ -8,24 +8,47 @@ import {
   ShieldCheck, 
   Save, 
   Loader2,
-  ChevronLeft
+  ChevronLeft,
+  Activity,
+  UserCheck,
+  Palette,
+  Layers,
+  Info
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import styles from './AdminSettings.module.css';
 
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 export const AdminSettings: React.FC = () => {
   const navigate = useNavigate();
   const church = useQuery(api.churches.getMyChurch);
-  const updateSettings = useMutation(api.churches.updateSettings);
+  const updateSettings = useMutation(api.churches.updateExtendedSettings);
   
+  const [activeTab, setActiveTab] = useState<'general' | 'geofence' | 'rules'>('general');
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     attendanceWindowMinutes: 30,
     geofenceRadius: 100,
     requireLeadApprovalForSwaps: false,
     lat: 0,
-    lng: 0
+    lng: 0,
+    lateThresholdMinutes: 15,
+    autoCheckoutHours: 4,
+    burnoutLimitShiftsPerMonth: 8,
+    swapDeadlineHours: 24,
+    radiusUnit: 'meters' as 'meters' | 'miles',
+    accentColor: '#8b5cf6'
   });
-  const [isSaving, setIsSaving] = useState(false);
+
+  const mapRef = useRef<HTMLDivElement>(null);
+  const googleMap = useRef<any>(null);
+  const marker = useRef<any>(null);
+  const circle = useRef<any>(null);
 
   useEffect(() => {
     if (church) {
@@ -34,25 +57,84 @@ export const AdminSettings: React.FC = () => {
         geofenceRadius: church.settings?.geofenceRadius ?? 100,
         requireLeadApprovalForSwaps: church.settings?.requireLeadApprovalForSwaps ?? false,
         lat: church.location?.lat ?? 0,
-        lng: church.location?.lng ?? 0
+        lng: church.location?.lng ?? 0,
+        lateThresholdMinutes: church.settings?.lateThresholdMinutes ?? 15,
+        autoCheckoutHours: church.settings?.autoCheckoutHours ?? 4,
+        burnoutLimitShiftsPerMonth: church.settings?.burnoutLimitShiftsPerMonth ?? 8,
+        swapDeadlineHours: church.settings?.swapDeadlineHours ?? 24,
+        radiusUnit: church.settings?.radiusUnit ?? 'meters',
+        accentColor: church.settings?.accentColor ?? '#8b5cf6'
       });
     }
   }, [church]);
+
+  // Map Initialization & Updates
+  useEffect(() => {
+    if (activeTab === 'geofence' && mapRef.current && window.google) {
+      const center = { lat: formData.lat || 6.5244, lng: formData.lng || 3.3792 }; // Default Lagos if 0
+      
+      if (!googleMap.current) {
+        googleMap.current = new window.google.maps.Map(mapRef.current, {
+          center,
+          zoom: 15,
+          disableDefaultUI: false,
+          styles: [
+            {
+              "featureType": "poi",
+              "elementType": "labels",
+              "stylers": [{ "visibility": "off" }]
+            }
+          ]
+        });
+
+        marker.current = new window.google.maps.Marker({
+          position: center,
+          map: googleMap.current,
+          draggable: true,
+          title: "Church Location"
+        });
+
+        circle.current = new window.google.maps.Circle({
+          strokeColor: "#8b5cf6",
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: "#8b5cf6",
+          fillOpacity: 0.2,
+          map: googleMap.current,
+          center: center,
+          radius: getMetersFromRadius(formData.geofenceRadius, formData.radiusUnit)
+        });
+
+        window.google.maps.event.addListener(marker.current, 'dragend', () => {
+          const pos = marker.current.getPosition();
+          setFormData(prev => ({ ...prev, lat: pos.lat(), lng: pos.lng() }));
+        });
+      }
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (googleMap.current && marker.current && circle.current) {
+      const newPos = { lat: formData.lat, lng: formData.lng };
+      marker.current.setPosition(newPos);
+      circle.current.setCenter(newPos);
+      circle.current.setRadius(getMetersFromRadius(formData.geofenceRadius, formData.radiusUnit));
+      googleMap.current.panTo(newPos);
+    }
+  }, [formData.lat, formData.lng, formData.geofenceRadius, formData.radiusUnit]);
+
+  function getMetersFromRadius(val: number, unit: 'meters' | 'miles') {
+    return unit === 'miles' ? val * 1609.34 : val;
+  }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
       await updateSettings({
-        attendanceWindowMinutes: formData.attendanceWindowMinutes,
-        geofenceRadius: formData.geofenceRadius,
-        requireLeadApprovalForSwaps: formData.requireLeadApprovalForSwaps,
-        location: {
-          lat: formData.lat,
-          lng: formData.lng
-        }
+        ...formData
       });
-      alert('Settings updated successfully!');
+      alert('Church Settings successfully saved!');
     } catch (err: any) {
       alert(err.message || 'Failed to update settings');
     } finally {
@@ -60,124 +142,217 @@ export const AdminSettings: React.FC = () => {
     }
   };
 
-  const useCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition((position) => {
-      setFormData(prev => ({
-        ...prev,
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      }));
-    });
-  };
-
-  if (!church) return <div className="p-8 text-center"><Loader2 className="animate-spin mx-auto" /></div>;
+  if (!church) return <div className="p-8 text-center"><Loader2 className="animate-spin mx-auto" size={48} /></div>;
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <button onClick={() => navigate(-1)} className={styles.backBtn}>
-          <ChevronLeft size={20} />
-        </button>
-        <div className={styles.titleGroup}>
-          <Settings className={styles.icon} size={24} />
-          <h1>Church Settings</h1>
+        <div className={styles.headerLeft}>
+          <button onClick={() => navigate(-1)} className={styles.backBtn}>
+            <ChevronLeft size={20} />
+          </button>
+          <div className={styles.titleGroup}>
+            <Settings className={styles.icon} size={28} />
+            <div>
+              <h1>Major Church Settings</h1>
+              <p>Configure your sanctuary's infrastructure and attendance rules.</p>
+            </div>
+          </div>
         </div>
+        <button type="button" onClick={handleSave} disabled={isSaving} className={styles.saveBtn}>
+          {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+          Save Changes
+        </button>
       </header>
 
-      <form onSubmit={handleSave} className={styles.form}>
-        <section className={styles.section}>
-          <div className={styles.sectionTitle}>
-            <Clock size={20} />
-            <h3>Attendance Window</h3>
-          </div>
-          <p className={styles.sectionDesc}>
-            Minutes before and after a service that volunteers can check in.
-          </p>
-          <div className={styles.inputGroup}>
-            <input 
-              type="number" 
-              value={formData.attendanceWindowMinutes}
-              onChange={(e) => setFormData({...formData, attendanceWindowMinutes: parseInt(e.target.value)})}
-              className={styles.input}
-            />
-            <span className={styles.unit}>minutes</span>
-          </div>
-        </section>
-
-        <section className={styles.section}>
-          <div className={styles.sectionTitle}>
-            <MapPin size={20} />
-            <h3>Geofencing</h3>
-          </div>
-          <p className={styles.sectionDesc}>
-            Maximum distance (radius) from church location to allow check-in.
-          </p>
-          <div className={styles.inputGrid}>
-            <div className={styles.inputGroup}>
-              <label>Radius (meters)</label>
-              <input 
-                type="number" 
-                value={formData.geofenceRadius}
-                onChange={(e) => setFormData({...formData, geofenceRadius: parseInt(e.target.value)})}
-                className={styles.input}
-              />
-            </div>
-            <div className={styles.locationControls}>
-              <div className={styles.inputGroup}>
-                <label>Latitude</label>
-                <input 
-                  type="number" step="any"
-                  value={formData.lat}
-                  onChange={(e) => setFormData({...formData, lat: parseFloat(e.target.value)})}
-                  className={styles.input}
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label>Longitude</label>
-                <input 
-                  type="number" step="any"
-                  value={formData.lng}
-                  onChange={(e) => setFormData({...formData, lng: parseFloat(e.target.value)})}
-                  className={styles.input}
-                />
-              </div>
-              <button 
-                type="button" 
-                onClick={useCurrentLocation}
-                className={styles.locationBtn}
-              >
-                Use My Current Location
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.section}>
-          <div className={styles.sectionTitle}>
-            <ShieldCheck size={20} />
-            <h3>Governance</h3>
-          </div>
-          <div className={styles.checkboxGroup}>
-            <label className={styles.checkboxLabel}>
-              <input 
-                type="checkbox"
-                checked={formData.requireLeadApprovalForSwaps}
-                onChange={(e) => setFormData({...formData, requireLeadApprovalForSwaps: e.target.checked})}
-              />
-              <span>Require Subunit Lead approval for shift swaps</span>
-            </label>
-          </div>
-        </section>
-
-        <button type="submit" disabled={isSaving} className={styles.saveBtn}>
-          {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-          Save Settings
+      <nav className={styles.tabs}>
+        <button 
+          className={`${styles.tab} ${activeTab === 'general' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('general')}
+        >
+          <Palette size={18} /> General & Branding
         </button>
-      </form>
+        <button 
+          className={`${styles.tab} ${activeTab === 'geofence' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('geofence')}
+        >
+          <MapPin size={18} /> Location & Geofence
+        </button>
+        <button 
+          className={`${styles.tab} ${activeTab === 'rules' ? styles.activeTab : ''}`}
+          onClick={() => setActiveTab('rules')}
+        >
+          <ShieldCheck size={18} /> Operational Rules
+        </button>
+      </nav>
+
+      <main className={styles.main}>
+        {activeTab === 'general' && (
+          <div className={styles.panel}>
+            <section className={styles.section}>
+              <h3><Layers size={20} /> App Appearance</h3>
+              <div className={styles.field}>
+                <label>Accent Color</label>
+                <div className={styles.colorPicker}>
+                  <input 
+                    type="color" 
+                    value={formData.accentColor}
+                    onChange={e => setFormData({...formData, accentColor: e.target.value})}
+                  />
+                  <code>{formData.accentColor}</code>
+                </div>
+                <p className={styles.hint}>This color will be used for printed tickets and high-priority UI elements.</p>
+              </div>
+            </section>
+
+            <section className={styles.section}>
+              <h3><Clock size={20} /> Attendance Defaults</h3>
+              <div className={styles.row}>
+                <div className={styles.field}>
+                  <label>Attendance Window</label>
+                  <div className={styles.inputWithUnit}>
+                    <input 
+                      type="number" 
+                      value={formData.attendanceWindowMinutes}
+                      onChange={e => setFormData({...formData, attendanceWindowMinutes: parseInt(e.target.value)})}
+                    />
+                    <span>minutes</span>
+                  </div>
+                </div>
+                <div className={styles.field}>
+                  <label>Auto-Checkout</label>
+                  <div className={styles.inputWithUnit}>
+                    <input 
+                      type="number" 
+                      value={formData.autoCheckoutHours}
+                      onChange={e => setFormData({...formData, autoCheckoutHours: parseInt(e.target.value)})}
+                    />
+                    <span>hours</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {activeTab === 'geofence' && (
+          <div className={styles.geofencePanel}>
+            <div className={styles.mapControls}>
+              <section className={styles.section}>
+                <h3><Info size={20} /> Configure Geofence</h3>
+                <p className={styles.desc}>Drag the marker to your church entrance or use the button below.</p>
+                
+                <div className={styles.field}>
+                  <label>Distance Unit</label>
+                  <select 
+                    value={formData.radiusUnit}
+                    onChange={e => setFormData({...formData, radiusUnit: e.target.value as any})}
+                    className={styles.select}
+                  >
+                    <option value="meters">Meters</option>
+                    <option value="miles">Miles</option>
+                  </select>
+                </div>
+
+                <div className={styles.field}>
+                  <label>Geofence Radius ({formData.radiusUnit})</label>
+                  <input 
+                    type="range"
+                    min="10"
+                    max={formData.radiusUnit === 'meters' ? 1000 : 5}
+                    step={formData.radiusUnit === 'meters' ? 10 : 0.1}
+                    value={formData.geofenceRadius}
+                    onChange={e => setFormData({...formData, geofenceRadius: parseFloat(e.target.value)})}
+                  />
+                  <div className={styles.radiusDisplay}>
+                    <strong>{formData.geofenceRadius}</strong> {formData.radiusUnit}
+                  </div>
+                </div>
+
+                <div className={styles.coordinates}>
+                  <div>Lat: {formData.lat.toFixed(6)}</div>
+                  <div>Lng: {formData.lng.toFixed(6)}</div>
+                </div>
+
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition(pos => {
+                        setFormData(prev => ({ ...prev, lat: pos.coords.latitude, lng: pos.coords.longitude }));
+                      });
+                    }
+                  }}
+                  className={styles.locationBtn}
+                >
+                  Sync to My Location
+                </button>
+              </section>
+            </div>
+            <div ref={mapRef} className={styles.mapContainer}></div>
+          </div>
+        )}
+
+        {activeTab === 'rules' && (
+          <div className={styles.panel}>
+            <section className={styles.section}>
+              <h3><Activity size={20} /> Burnout & Capacity</h3>
+              <div className={styles.field}>
+                <label>Volunteer Burnout Limit</label>
+                <div className={styles.inputWithUnit}>
+                  <input 
+                    type="number" 
+                    value={formData.burnoutLimitShiftsPerMonth}
+                    onChange={e => setFormData({...formData, burnoutLimitShiftsPerMonth: parseInt(e.target.value)})}
+                  />
+                  <span>shifts per month</span>
+                </div>
+                <p className={styles.hint}>Rota will flag a warning if a volunteer is assigned more shifts than this.</p>
+              </div>
+            </section>
+
+            <section className={styles.section}>
+              <h3><UserCheck size={20} /> Governance & Swaps</h3>
+              <div className={styles.row}>
+                <div className={styles.field}>
+                  <label>Late Threshold</label>
+                  <div className={styles.inputWithUnit}>
+                    <input 
+                      type="number" 
+                      value={formData.lateThresholdMinutes}
+                      onChange={e => setFormData({...formData, lateThresholdMinutes: parseInt(e.target.value)})}
+                    />
+                    <span>minutes</span>
+                  </div>
+                </div>
+                <div className={styles.field}>
+                  <label>Swap Request Deadline</label>
+                  <div className={styles.inputWithUnit}>
+                    <input 
+                      type="number" 
+                      value={formData.swapDeadlineHours}
+                      onChange={e => setFormData({...formData, swapDeadlineHours: parseInt(e.target.value)})}
+                    />
+                    <span>hours before shift</span>
+                  </div>
+                </div>
+              </div>
+              
+              <label className={styles.checkboxLabel}>
+                <input 
+                  type="checkbox"
+                  checked={formData.requireLeadApprovalForSwaps}
+                  onChange={(e) => setFormData({...formData, requireLeadApprovalForSwaps: e.target.checked})}
+                />
+                <div className={styles.checkboxInfo}>
+                  <strong>Require Staff Approval</strong>
+                  <span>Leads must approve all swap requests manually.</span>
+                </div>
+              </label>
+            </section>
+          </div>
+        )}
+      </main>
     </div>
   );
 };

@@ -118,16 +118,22 @@ export const Rota: React.FC = () => {
           </button>
         </div>
         
-        <button className={styles.addBtn}>
+        <button className={styles.addBtn} onClick={() => setIsAssigning(true)}>
           <Plus size={18} />
           <span>Add Shift</span>
         </button>
       </div>
 
       <div className={styles.grid}>
-        {weekDays.map(day => (
+        {weekDays.map(day => {
+          const hasService = services?.some(s => isSameDay(new Date(s.startTime), day));
+          return (
           <div key={day.toString()} className={styles.dayColumn}>
-            <div className={`${styles.dayHeader} ${isSameDay(day, new Date()) ? styles.today : ''}`}>
+            <div className={`
+              ${styles.dayHeader} 
+              ${isSameDay(day, new Date()) ? styles.today : ''}
+              ${hasService ? styles.hasService : ''}
+            `}>
               <div className={styles.dayInfo}>
                 <span className={styles.dayName}>{format(day, 'EEE')}</span>
                 <span className={styles.dayNumber}>{format(day, 'd')}</span>
@@ -175,23 +181,42 @@ export const Rota: React.FC = () => {
               </button>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Gap Detection Sidebar */}
       <div className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <AlertCircle size={18} />
-          <h3>Health Audit</h3>
+          <h3>Coverage Audit</h3>
         </div>
         <div className={styles.gapList}>
           {rotaEntries.length === 0 ? (
-            <p className={styles.emptyText}>No shifts assigned this week.</p>
-          ) : (
-            <div className={styles.gapItem}>
-              <p className={styles.gapTitle}>Weekly Capacity</p>
-              <p className={styles.gapMeta}>{rotaEntries.length} positions filled</p>
+            <div className={styles.auditStatus}>
+              <p className={styles.emptyText}>No shifts assigned this week.</p>
             </div>
+          ) : (
+            <>
+              <div className={styles.auditItem}>
+                <p className={styles.auditLabel}>Weekly Capacity</p>
+                <div className={styles.auditValue}>
+                  <strong>{rotaEntries.length}</strong> positions filled
+                </div>
+              </div>
+              
+              {/* Proactive warnings */}
+              {services?.filter(s => s.startTime >= startDate && s.startTime <= endDate).map(s => {
+                const filled = rotaEntries.filter(r => r.serviceId === s._id).length;
+                const isUnderstaffed = filled < 3; // Mock logic for "understaffed"
+                return isUnderstaffed ? (
+                  <div key={s._id} className={styles.auditWarning}>
+                    <p><strong>{s.name}</strong> is understaffed</p>
+                    <span>Only {filled} volunteers assigned</span>
+                  </div>
+                ) : null;
+              })}
+            </>
           )}
         </div>
       </div>
@@ -298,7 +323,7 @@ export const Rota: React.FC = () => {
                 >
                   <option value="">Select Unit</option>
                   {subunits?.map(sub => (
-                    <option key={sub._id} value={sub._id}>{sub.name} ({sub.department})</option>
+                    <option key={sub._id} value={sub._id}>{sub.name} ({sub.departmentName})</option>
                   ))}
                 </select>
               </div>

@@ -129,6 +129,39 @@ export const updateSettings = mutation({
   },
 });
 
+export const updateExtendedSettings = mutation({
+  args: {
+    lateThresholdMinutes: v.optional(v.number()),
+    autoCheckoutHours: v.optional(v.number()),
+    burnoutLimitShiftsPerMonth: v.optional(v.number()),
+    swapDeadlineHours: v.optional(v.number()),
+    radiusUnit: v.optional(v.union(v.literal("meters"), v.literal("miles"))),
+    accentColor: v.optional(v.string()),
+    attendanceWindowMinutes: v.optional(v.number()),
+    geofenceRadius: v.optional(v.number()),
+    requireLeadApprovalForSwaps: v.optional(v.boolean()),
+    defaultQrType: v.optional(v.union(v.literal("Unique"), v.literal("Generic"))),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId || user.role !== "SuperAdmin") {
+      throw new Error("Unauthorized");
+    }
+
+    const church = await ctx.db.get(user.churchId);
+    if (!church) throw new Error("Church not found");
+
+    await ctx.db.patch(user.churchId, {
+      settings: {
+        ...(church.settings || {}),
+        ...args,
+      },
+    });
+  },
+});
+
 export const getChurchStats = query({
   handler: async (ctx) => {
     const userId = await auth.getUserId(ctx);

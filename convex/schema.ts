@@ -38,7 +38,7 @@ export default defineSchema({
     additionalSubunits: v.optional(v.array(v.string())),
     isExtendedProbation: v.optional(v.boolean()),
     isBorrowed: v.optional(v.boolean()),
-  }).index("by_email", ["email"])
+  }).index("email", ["email"])
     .index("by_church", ["churchId"]),
   
   churches: defineTable({
@@ -58,6 +58,12 @@ export default defineSchema({
       requireLeadApprovalForSwaps: v.optional(v.boolean()),
       defaultQrType: v.optional(v.union(v.literal("Unique"), v.literal("Generic"))),
       qrCodeSecret: v.optional(v.string()), // Church-wide secret for daily passes
+      lateThresholdMinutes: v.optional(v.number()),
+      autoCheckoutHours: v.optional(v.number()),
+      burnoutLimitShiftsPerMonth: v.optional(v.number()),
+      swapDeadlineHours: v.optional(v.number()),
+      radiusUnit: v.optional(v.union(v.literal("meters"), v.literal("miles"))),
+      accentColor: v.optional(v.string()),
     })),
   }).index("by_slug", ["slug"]),
 

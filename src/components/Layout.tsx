@@ -34,6 +34,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
   const navItems = [
     { label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer', 'Probation', 'OnNotice'] },
     { label: 'Admin', icon: <Shield size={20} />, path: '/admin', roles: ['SuperAdmin'] },
+    { label: 'Church Settings', icon: <Settings size={20} />, path: '/admin/settings', roles: ['SuperAdmin'] },
     { label: 'Services', icon: <Calendar size={20} />, path: '/services', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead'] },
     { label: 'Attendance', icon: <UserCheck size={20} />, path: '/attendance', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer', 'Probation', 'OnNotice'] },
     { label: 'Rota', icon: <Calendar size={20} />, path: '/rota', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer'] },

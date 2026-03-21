@@ -21,6 +21,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { AdminPage } from './pages/AdminPage';
 import { AdminSettings } from './pages/AdminSettings';
 import { ServiceManagement } from './pages/ServiceManagement';
+import { PrintAttendance } from './pages/PrintAttendance';
 import { DebugAuth } from './pages/DebugAuth';
 import { Layout } from './components/Layout';
 import { MobileLayout } from './layouts/MobileLayout';
@@ -133,6 +134,7 @@ function AppContent() {
           <ProfilePage />
         </PageLayout>
       } />
+      <Route path="/print/attendance/:churchId" element={<PrintAttendance />} />
       <Route path="/debug-auth" element={<DebugAuth />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

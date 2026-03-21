@@ -59,7 +59,9 @@ export const ServiceManagement: React.FC = () => {
     if (!church?.settings?.qrCodeSecret) {
       await initializeQrSecret();
     }
-    setShowDailyPass(true);
+    // Open the new high-fidelity print route in a new tab
+    const printUrl = `/print/attendance/${church?._id}?secret=${church?.settings?.qrCodeSecret || ''}&date=${format(new Date(), 'yyyy-MM-dd')}`;
+    window.open(printUrl, '_blank');
   };
 
   if (services === undefined || church === undefined) {
