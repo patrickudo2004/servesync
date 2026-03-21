@@ -34,3 +34,20 @@ body {
   color: var(--text-primary);
   transition: background-color 0.3s, color 0.3s;
 }
+
+/* Global Form Reset for Dark Mode Compatibility */
+input, select, textarea {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

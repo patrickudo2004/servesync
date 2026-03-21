@@ -1,8 +1,8 @@
 .container {
-  background: white;
+  background: var(--card-bg);
   border-radius: 24px;
   padding: 2rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
 }
 
 .header {
@@ -27,7 +27,7 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .header p {
@@ -57,16 +57,18 @@
 .field label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .field input, .field select {
   padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   font-size: 0.9375rem;
   font-family: inherit;
   transition: all 0.2s;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .field input:focus, .field select:focus {
@@ -98,15 +100,15 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.75rem;
-  color: #6b7280;
-  background: #f9fafb;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
   padding: 0.75rem;
   border-radius: 10px;
 }
 
 .submitBtn {
   margin-top: 0.5rem;
-  background: #111827;
+  background: #8b5cf6;
   color: white;
   border: none;
   padding: 1rem;
@@ -122,7 +124,7 @@
 }
 
 .submitBtn:hover {
-  background: #000;
+  background: #7c3aed;
   transform: translateY(-1px);
 }
 

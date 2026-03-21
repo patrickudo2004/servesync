@@ -14,7 +14,7 @@
 .header h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
@@ -24,9 +24,9 @@
 }
 
 .tableCard {
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   overflow: hidden;
 }
 
@@ -38,20 +38,20 @@
 
 .table th {
   padding: 1rem 1.5rem;
-  background: #f9fafb;
+  background: var(--bg-secondary);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6b7280;
-  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table td {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border-color);
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -96,12 +96,12 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  background: white;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
 }

@@ -1,9 +1,9 @@
 .container {
-  background: white;
+  background: var(--card-bg);
   border-radius: 24px;
   padding: 2rem;
-  border: 1px solid #e5e7eb;
-  color: #111827;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .header {
@@ -32,7 +32,7 @@
 .titleGroup p {
   margin: 0.25rem 0 0 0;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .statusBadge {
@@ -53,7 +53,7 @@
 }
 
 .statCard {
-  background: #f9fafb;
+  background: var(--bg-secondary);
   padding: 1.25rem;
   border-radius: 16px;
   display: flex;
@@ -64,7 +64,7 @@
 .statIcon {
   width: 40px;
   height: 40px;
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -103,7 +103,7 @@
 
 .logCard {
   padding: 1rem;
-  border: 1px solid #f3f4f6;
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   transition: transform 0.2s;
 }

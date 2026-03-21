@@ -30,7 +30,7 @@
 .statValue {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .addBtn {
@@ -53,10 +53,10 @@
 }
 
 .card {
-  background: white;
+  background: var(--card-bg);
   padding: 1.5rem;
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -76,6 +76,20 @@
   min-width: 200px;
 }
 
+.iconBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
 .avatar {
   width: 40px;
   height: 40px;
@@ -90,7 +104,7 @@
 
 .userName {
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .miniBadge {
@@ -135,6 +149,24 @@
   gap: 0.5rem;
 }
 
+.table th {
+  padding: 1rem 1.5rem;
+  background: var(--bg-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tableCard {
+  background: var(--card-bg);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
 .approveBtn, .rejectBtn {
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -169,7 +201,7 @@
 }
 
 .modal {
-  background: white;
+  background: var(--card-bg);
   padding: 2rem;
   border-radius: 20px;
   width: 100%;
@@ -202,9 +234,11 @@
 
 .field input, .field textarea {
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-family: inherit;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .field textarea {
@@ -227,9 +261,9 @@
 }
 
 .cancelBtn {
-  background: white;
-  border: 1px solid #e5e7eb;
-  color: #4b5563;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 .submitBtn {

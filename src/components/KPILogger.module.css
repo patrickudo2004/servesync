@@ -1,8 +1,8 @@
 .container {
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
   padding: 1.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -10,7 +10,7 @@
   margin: 0 0 0.25rem 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .header p {
@@ -35,10 +35,10 @@
   padding: 1rem;
   border-radius: 12px;
   border: 2px solid transparent;
-  background: #f9fafb;
+  background: var(--bg-secondary);
   cursor: pointer;
   transition: all 0.2s;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .scoreBtn span {
@@ -48,7 +48,7 @@
 
 .scoreBtn:hover {
   transform: translateY(-2px);
-  background: white;
+  background: var(--card-bg);
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
@@ -87,11 +87,13 @@
 .textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   font-size: 0.875rem;
   font-family: inherit;
   resize: none;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .textarea:focus {
@@ -101,7 +103,7 @@
 }
 
 .submitBtn {
-  background: #111827;
+  background: #8b5cf6;
   color: white;
   border: none;
   padding: 0.875rem;
@@ -116,7 +118,7 @@
 }
 
 .submitBtn:hover {
-  background: #000;
+  background: #7c3aed;
 }
 
 .submitBtn:disabled {

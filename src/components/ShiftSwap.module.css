@@ -1,8 +1,8 @@
 .offerContainer {
-  background: white;
+  background: var(--card-bg);
   padding: 1.5rem;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   margin-bottom: 1.5rem;
 }
 
@@ -38,7 +38,9 @@
   width: 100%;
   padding: 0.75rem;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-primary);
   font-family: inherit;
   font-size: 0.875rem;
   resize: none;
@@ -118,10 +120,10 @@
 }
 
 .swapCard {
-  background: white;
+  background: var(--card-bg);
   padding: 1.25rem;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
@@ -159,8 +161,8 @@
   gap: 0.5rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  color: #1e293b;
-  background: #f1f5f9;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
   padding: 0.4rem 0.75rem;
   border-radius: 99px;
 }

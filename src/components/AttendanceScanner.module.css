@@ -1,10 +1,11 @@
 .container {
   padding: 24px;
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   max-width: 450px;
   margin: 0 auto;
+  border: 1px solid var(--border-color);
 }
 
 .header {
@@ -18,7 +19,7 @@
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .icon {
@@ -41,16 +42,16 @@
 }
 
 .error {
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fee2e2;
+  background: rgba(220, 38, 38, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(220, 38, 38, 0.2);
 }
 
 .success {
   flex-direction: column;
-  background: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #dcfce7;
+  background: rgba(22, 163, 74, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(22, 163, 74, 0.2);
   padding: 32px;
   text-align: center;
   border-radius: 20px;
@@ -65,11 +66,11 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  background: #111827;
+  background: #000;
   border-radius: 20px;
   overflow: hidden;
   margin-bottom: 24px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border-color);
 }
 
 .reader {
@@ -133,8 +134,8 @@
 }
 
 .stopBtn {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
 }
 
 .stopBtn:hover {
@@ -143,7 +144,7 @@
 
 .resetBtn {
   margin-top: 1.5rem;
-  background: white;
+  background: var(--card-bg);
   color: #8b5cf6;
   border: 2px solid #8b5cf6;
   padding: 0.75rem 2rem;
@@ -154,7 +155,7 @@
 }
 
 .resetBtn:hover {
-  background: #f5f3ff;
+  background: rgba(139, 92, 246, 0.05);
 }
 
 .footer {

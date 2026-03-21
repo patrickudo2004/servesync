@@ -1,8 +1,8 @@
 .container {
-  background: white;
+  background: var(--card-bg);
   border-radius: 20px;
   padding: 2rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
 }
 
 .header {
@@ -26,13 +26,13 @@
 .header h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .header p {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -51,16 +51,18 @@
 .field label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .field textarea, .field select {
   padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   font-size: 0.9375rem;
   font-family: inherit;
   transition: all 0.2s;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .field textarea:focus, .field select:focus {
@@ -82,7 +84,7 @@
 
 .submitBtn {
   margin-top: 1rem;
-  background: #111827;
+  background: #8b5cf6;
   color: white;
   border: none;
   padding: 1rem;
@@ -97,7 +99,8 @@
 }
 
 .submitBtn:hover {
-  background: #000;
+  background: #7c3aed;
+  transform: translateY(-1px);
 }
 
 .submitBtn:disabled {

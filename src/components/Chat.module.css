@@ -2,14 +2,14 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 144px); /* Adjust for header and bottom nav */
-  background-color: #f0f2f5;
+  background-color: var(--bg-primary);
   position: relative;
 }
 
 .channelHeader {
   padding: 1rem;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -20,7 +20,7 @@
   margin: 0;
   font-size: 1.125rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .channelInfo p {
@@ -40,8 +40,8 @@
 
 .inputArea {
   padding: 0.75rem 1rem;
-  background: white;
-  border-top: 1px solid #e5e7eb;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color);
   display: flex;
   align-items: flex-end;
   gap: 0.75rem;
@@ -50,7 +50,7 @@
 
 .inputWrapper {
   flex: 1;
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   border-radius: 24px;
   padding: 0.5rem 1rem;
   display: flex;
@@ -68,6 +68,7 @@
   font-size: 0.9375rem;
   max-height: 120px;
   outline: none;
+  color: var(--text-primary);
 }
 
 .iconBtn {
@@ -129,12 +130,12 @@
 }
 
 .bubbleWrapper.own .bubble {
-  background-color: #dcf8c6;
+  background-color: #8b5cf630;
   border-top-right-radius: 2px;
 }
 
 .bubbleWrapper:not(.own) .bubble {
-  background-color: white;
+  background-color: var(--bg-secondary);
   border-top-left-radius: 2px;
 }
 
@@ -189,7 +190,7 @@
 .fileIcon {
   width: 40px;
   height: 40px;
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -221,7 +222,7 @@
   bottom: 80px;
   left: 1rem;
   right: 1rem;
-  background: white;
+  background: var(--card-bg);
   padding: 0.75rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -229,6 +230,7 @@
   align-items: center;
   gap: 1rem;
   z-index: 20;
+  border: 1px solid var(--border-color);
 }
 
 .progressBar {
@@ -254,9 +256,9 @@
 
 .channelItem {
   padding: 1rem;
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -265,18 +267,18 @@
 }
 
 .channelItem:hover {
-  background: #f9fafb;
+  background: var(--bg-secondary);
 }
 
 .channelIcon {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: #f3f4f6;
+  background: var(--bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .channelItem.active {

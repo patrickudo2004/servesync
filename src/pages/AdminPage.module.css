@@ -188,7 +188,7 @@
 }
 
 .deleteBtn:hover {
-  background: #fef2f2;
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .userTableWrapper {
@@ -318,21 +318,21 @@
 }
 
 .infoCard {
-  background: #eff6ff;
+  background: var(--bg-secondary);
   padding: 1.5rem;
   border-radius: 20px;
-  border: 1px solid #dbeafe;
+  border: 1px solid var(--border-color);
 }
 
 .infoCard h3 {
   font-size: 1rem;
-  color: #1e40af;
+  color: #8b5cf6;
   margin: 0 0 0.5rem 0;
 }
 
 .infoCard p {
   font-size: 0.875rem;
-  color: #1e3a8a;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
 }

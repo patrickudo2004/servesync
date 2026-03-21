@@ -1,14 +1,14 @@
 .container {
   display: flex;
   height: calc(100vh - 80px); /* Account for bottom nav */
-  background: white;
+  background: var(--bg-primary);
   overflow: hidden;
 }
 
 .sidebar {
   width: 260px;
-  border-right: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-secondary);
   display: flex;
   flex-direction: column;
 }
@@ -21,13 +21,13 @@
 
 .sidebarHeader {
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .sidebarHeader h3 {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .channelList {
@@ -54,8 +54,8 @@
 }
 
 .channelBtn:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .activeChannel {
@@ -67,12 +67,12 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--bg-primary);
 }
 
 .chatHeader {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -82,7 +82,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .headerInfo h4 {
@@ -138,7 +138,7 @@
 
 .authorName {
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .messageRole {
@@ -155,7 +155,7 @@
 }
 
 .text {
-  color: #374151;
+  color: var(--text-primary);
   line-height: 1.5;
   word-break: break-word;
 }
@@ -171,7 +171,7 @@
 
 .inputArea {
   padding: 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -180,9 +180,11 @@
 .inputArea input {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 0.75rem;
   outline: none;
+  background: var(--input-bg);
+  color: var(--text-primary);
   transition: border-color 0.2s;
 }
 
