@@ -8,7 +8,8 @@ import {
   ChevronRight,
   Settings as SettingsIcon,
   Building2,
-  Sparkles
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 import { 
   BarChart, 
