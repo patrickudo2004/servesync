@@ -56,12 +56,10 @@ export const ServiceManagement: React.FC = () => {
     }
   };
 
-  const handlePrintDaily = async () => {
-    if (!church?.settings?.qrCodeSecret) {
-      await initializeQrSecret();
-    }
-    // Open the new high-fidelity print route in a new tab
-    const printUrl = `/print/attendance/${church?._id}?secret=${church?.settings?.qrCodeSecret || ''}&date=${format(new Date(), 'yyyy-MM-dd')}`;
+  const handlePrintPass = (startTime: number) => {
+    // Open the high-fidelity print route for this service's specific date
+    const dateStr = format(new Date(startTime), 'yyyy-MM-dd');
+    const printUrl = `/print/attendance/${church?._id}?secret=${church?.settings?.qrCodeSecret || ''}&date=${dateStr}`;
     window.open(printUrl, '_blank');
   };
 
@@ -84,9 +82,6 @@ export const ServiceManagement: React.FC = () => {
           </div>
         </div>
         <div className={styles.headerActions}>
-          <button className={styles.printDailyBtn} onClick={handlePrintDaily}>
-            <Printer size={20} /> Print Daily Pass
-          </button>
           <button className={styles.addBtn} onClick={() => setIsAdding(true)}>
             <Plus size={20} /> Create Service
           </button>
@@ -126,10 +121,10 @@ export const ServiceManagement: React.FC = () => {
                 </div>
               </div>
               <button 
-                className={styles.qrBtn}
-                onClick={() => setSelectedService(service)}
+                className={styles.printBtn}
+                onClick={() => handlePrintPass(service.startTime)}
               >
-                <QrCode size={18} /> View QR
+                <Printer size={18} /> Print Pass
               </button>
             </div>
           ))

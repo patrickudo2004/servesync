@@ -5,9 +5,10 @@ import {
   Calendar as CalendarIcon, 
   CheckCircle,
   Clock,
-  AlertTriangle,
   ChevronRight,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Building2,
+  Sparkles
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -37,6 +38,7 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
   const navigate = useNavigate();
   const me = useQuery(api.users.me);
+  const church = useQuery(api.churches.getMyChurch);
   const stats = useQuery(api.churches.getChurchStats);
   const organogramData = useQuery(api.churches.getOrganogram);
   const activities = useQuery(api.churches.getRecentActivities);
@@ -51,24 +53,54 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
     }
   }, [me?.churchId, ensureChannels, seedBadges]);
 
+  if (!me || !church || !stats) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="animate-spin text-purple-600" size={32} />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
-      {/* Stats Grid */}
+      {/* Church Identity Hero */}
+      <div className={styles.heroSection}>
+        <div className={styles.heroContent}>
+          <div className={styles.churchIdentity}>
+            <div className={styles.logoWrapper}>
+              {church.logoUrl ? (
+                <img src={church.logoUrl} alt={church.name} className={styles.logo} />
+              ) : (
+                <div className={styles.fallbackLogo}>
+                  <Building2 size={32} />
+                </div>
+              )}
+            </div>
+            <div className={styles.titles}>
+              <div className={styles.badge}>
+                <Sparkles size={12} />
+                <span>Sanctuary Dashboard</span>
+              </div>
+              <h1>{church.name}</h1>
+              <p>Welcome back, {me.name || 'Admin'}. Here is your church's operational pulse.</p>
+            </div>
+          </div>
+          
+          {userRole === 'SuperAdmin' && (
+            <button 
+              onClick={() => navigate('/admin/settings')}
+              className={styles.settingsBtn}
+            >
+              <SettingsIcon size={18} />
+              Configure Church
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Oversight View - Only for Pastoral Oversight and Super Admins */}
       {(userRole === 'PastoralOversight' || userRole === 'SuperAdmin') && me?.department && (
         <OversightDashboardTab department={me.department} />
-      )}
-
-      {userRole === 'SuperAdmin' && (
-        <div className="flex justify-end mb-4">
-          <button 
-            onClick={() => navigate('/admin/settings')}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:text-purple-600 hover:border-purple-200 transition-all text-sm font-medium shadow-sm"
-          >
-            <SettingsIcon size={16} />
-            Church Settings
-          </button>
-        </div>
       )}
 
       <div className={styles.statsGrid}>
