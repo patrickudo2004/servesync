@@ -189,13 +189,14 @@
 }
 
 .modal {
-  background: white;
+  background: var(--card-bg);
   width: 100%;
   max-width: 500px;
   border-radius: 28px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   overflow: hidden;
   animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid var(--border-color);
 }
 
 @keyframes modalIn {
@@ -205,7 +206,7 @@
 
 .modalHeader {
   padding: 2rem;
-  background: linear-gradient(to right, #f9fafb, white);
+  background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
@@ -265,13 +266,14 @@
   border: 1px solid var(--border-color);
   font-size: 1rem;
   transition: all 0.2s;
-  background: #f9fafb;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .field input:focus, .field select:focus {
   outline: none;
   border-color: #8b5cf6;
-  background: white;
+  background: var(--card-bg);
   box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
 }
 
