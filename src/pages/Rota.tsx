@@ -1,36 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { 
-  Calendar as CalendarIcon, 
-  ChevronLeft, 
-  ChevronRight, 
   Plus,
   Clock,
-  User,
   AlertCircle,
   X,
   Trash2,
-  Loader2
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  TrendingDown,
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
-import { format, addDays, startOfWeek, addWeeks, subWeeks, isSameDay, endOfWeek } from 'date-fns';
+import { 
+  format, 
+  addDays, 
+  startOfWeek, 
+  addWeeks, 
+  subWeeks, 
+  isSameDay, 
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  addMonths,
+  subMonths,
+  isSameMonth,
+  startOfYear,
+  endOfYear,
+  eachMonthOfInterval,
+  getYear
+} from 'date-fns';
 import styles from './Rota.module.css';
-import { RoleBadge, UserRole } from '../components/RoleBadge';
+import { RoleBadge } from '../components/RoleBadge';
+
+type ViewMode = 'week' | 'month' | 'year';
 
 export const Rota: React.FC = () => {
-  const [currentWeek, setCurrentWeek] = useState(new Date());
-  const startDate = startOfWeek(currentWeek).getTime();
-  const endDate = endOfWeek(currentWeek).getTime();
-  
-  const rotaEntries = useQuery(api.rotas.getRotaForWeek, { startDate, endDate });
+  const [viewMode, setViewMode] = useState<ViewMode>('month');
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  // Range calculations based on viewMode
+  const { startDate, endDate } = useMemo(() => {
+    if (viewMode === 'week') {
+      return { 
+        startDate: startOfWeek(currentDate).getTime(),
+        endDate: endOfWeek(currentDate).getTime() 
+      };
+    } else if (viewMode === 'month') {
+      return {
+        startDate: startOfMonth(currentDate).getTime(),
+        endDate: endOfMonth(currentDate).getTime()
+      };
+    } else {
+      return {
+        startDate: startOfYear(currentDate).getTime(),
+        endDate: endOfYear(currentDate).getTime()
+      };
+    }
+  }, [currentDate, viewMode]);
+
+  // Queries
+  const rotaEntries = useQuery(api.rotas.getRotaForRange, { startDate, endDate });
+  const coverageStats = useQuery(api.rotas.getCoverageStats, { year: getYear(currentDate) });
   const allUsers = useQuery(api.users.getAllChurchUsers);
   const services = useQuery(api.services.getChurchServices);
   const subunits = useQuery(api.subunits.getSubunits);
 
+  // Mutations
   const createShift = useMutation(api.rotas.createRotaEntry);
   const removeShift = useMutation(api.rotas.removeRotaEntry);
   const createService = useMutation(api.services.createService);
 
+  // State
   const [isAssigning, setIsAssigning] = useState(false);
   const [isAddingService, setIsAddingService] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
@@ -48,15 +92,29 @@ export const Rota: React.FC = () => {
     qrType: 'Unique' as 'Unique' | 'Generic'
   });
 
+  // Handlers
+  const handleNav = (dir: 'prev' | 'next') => {
+    if (viewMode === 'week') {
+      setCurrentDate(prev => dir === 'prev' ? subWeeks(prev, 1) : addWeeks(prev, 1));
+    } else if (viewMode === 'month') {
+      setCurrentDate(prev => dir === 'prev' ? subMonths(prev, 1) : addMonths(prev, 1));
+    } else {
+      setCurrentDate(prev => {
+        const d = new Date(prev);
+        d.setFullYear(d.getFullYear() + (dir === 'prev' ? -1 : 1));
+        return d;
+      });
+    }
+  };
+
   const handleCreateService = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDay) return;
-    
     try {
       const [hours, minutes] = newService.time.split(':').map(Number);
       const startTime = new Date(selectedDay);
       startTime.setHours(hours, minutes, 0, 0);
-      const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); // 2h default
+      const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000);
 
       await createService({
         name: newService.name,
@@ -101,175 +159,203 @@ export const Rota: React.FC = () => {
     );
   }
 
-  const weekDays = [...Array(7)].map((_, i) => addDays(startOfWeek(currentWeek), i));
-
-  return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div className={styles.nav}>
-          <button onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))} className={styles.navBtn}>
-            <ChevronLeft size={20} />
-          </button>
-          <h2 className={styles.weekRange}>
-            {format(startDate, 'MMM d')} - {format(addDays(startDate, 6), 'MMM d, yyyy')}
-          </h2>
-          <button onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))} className={styles.navBtn}>
-            <ChevronRight size={20} />
-          </button>
-        </div>
-        
-        <button className={styles.addBtn} onClick={() => setIsAssigning(true)}>
-          <Plus size={18} />
-          <span>Add Shift</span>
-        </button>
-      </div>
-
-      <div className={styles.grid}>
+  // View Renderers
+  const renderWeekView = () => {
+    const weekDays = eachDayOfInterval({ start: startOfWeek(currentDate), end: endOfWeek(currentDate) });
+    return (
+      <div className={styles.weekGrid}>
         {weekDays.map(day => {
           const hasService = services?.some(s => isSameDay(new Date(s.startTime), day));
           return (
-          <div key={day.toString()} className={styles.dayColumn}>
-            <div className={`
-              ${styles.dayHeader} 
-              ${isSameDay(day, new Date()) ? styles.today : ''}
-              ${hasService ? styles.hasService : ''}
-            `}>
-              <div className={styles.dayInfo}>
-                <span className={styles.dayName}>{format(day, 'EEE')}</span>
-                <span className={styles.dayNumber}>{format(day, 'd')}</span>
+            <div key={day.toString()} className={styles.dayColumn}>
+              <div className={`${styles.dayHeader} ${isSameDay(day, new Date()) ? styles.today : ''} ${hasService ? styles.hasService : ''}`}>
+                <div className={styles.dayInfo}>
+                  <span className={styles.dayName}>{format(day, 'EEE')}</span>
+                  <span className={styles.dayNumber}>{format(day, 'd')}</span>
+                </div>
+                <button className={styles.dayAddBtn} onClick={() => { setSelectedDay(day); setIsAddingService(true); }}>
+                  <Plus size={14} />
+                </button>
               </div>
-              <button 
-                className={styles.dayAddBtn} 
-                onClick={() => { setSelectedDay(day); setIsAddingService(true); }}
-                title="Add Service"
-              >
-                <Plus size={14} />
-              </button>
-            </div>
-            
-            <div className={styles.slots}>
-              {rotaEntries
-                .filter(r => isSameDay(new Date(r.date), day))
-                .map(entry => (
-                  <div key={entry._id} className={`${styles.card} ${styles[entry.status.toLowerCase()]}`}>
-                    <div className={styles.cardHeader}>
-                      <span className={styles.position}>{entry.position}</span>
-                      <div className={styles.cardActions}>
-                        {entry.status === 'Pending' && <Clock size={12} className={styles.pendingIcon} />}
-                        <button onClick={() => handleDelete(entry._id)} className={styles.deleteBtn}>
-                          <Trash2 size={12} />
-                        </button>
+              <div className={styles.slots}>
+                {rotaEntries
+                  .filter(r => isSameDay(new Date(r.date), day))
+                  .map(entry => (
+                    <div key={entry._id} className={`${styles.card} ${entry.status === 'Confirmed' ? styles.confirmed : styles.pending}`}>
+                      <div className={styles.cardHeader}>
+                        <span className={styles.position}>{entry.position}</span>
+                        <div className={styles.cardActions}>
+                          <button onClick={() => handleDelete(entry._id)} className={styles.deleteBtn}>
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                      <div className={styles.serviceTag}>{entry.serviceName}</div>
+                      <div className={styles.cardUser}>
+                        <div className={styles.avatar}>{entry.userName[0]}</div>
+                        <div className={styles.userName}>{entry.userName}</div>
                       </div>
                     </div>
-                    <div className={styles.serviceTag}>{entry.serviceName}</div>
-                    <div className={styles.cardUser}>
-                      <div className={styles.avatar}>{entry.userName[0]}</div>
-                      <div className={styles.userDetails}>
-                        <p className={styles.userName}>{entry.userName}</p>
-                        <RoleBadge role={entry.userRole as any} className={styles.miniBadge} />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              
-              <button 
-                className={styles.emptySlot}
-                onClick={() => setIsAssigning(true)}
-              >
-                <Plus size={14} />
-                <span>Assign Volunteer</span>
-              </button>
+                  ))}
+                <button className={styles.emptySlot} onClick={() => setIsAssigning(true)}>
+                  <Plus size={14} /> <span>Assign</span>
+                </button>
+              </div>
             </div>
-          </div>
           );
         })}
       </div>
+    );
+  };
 
-      {/* Gap Detection Sidebar */}
-      <div className={styles.sidebar}>
-        <div className={styles.sidebarHeader}>
-          <AlertCircle size={18} />
-          <h3>Coverage Audit</h3>
-        </div>
-        <div className={styles.gapList}>
-          {rotaEntries.length === 0 ? (
-            <div className={styles.auditStatus}>
-              <p className={styles.emptyText}>No shifts assigned this week.</p>
-            </div>
-          ) : (
-            <>
-              <div className={styles.auditItem}>
-                <p className={styles.auditLabel}>Weekly Capacity</p>
-                <div className={styles.auditValue}>
-                  <strong>{rotaEntries.length}</strong> positions filled
-                </div>
+  const renderMonthView = () => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const calendarStart = startOfWeek(monthStart);
+    const calendarEnd = endOfWeek(monthEnd);
+    const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+
+    return (
+      <div className={styles.monthGrid}>
+        {days.map(day => {
+          const dayServices = services?.filter(s => isSameDay(new Date(s.startTime), day)) || [];
+          return (
+            <div key={day.toString()} className={`
+              ${styles.monthDay} 
+              ${!isSameMonth(day, currentDate) ? styles.otherMonth : ''} 
+              ${isSameDay(day, new Date()) ? styles.today : ''}
+            `}>
+              <div className={styles.monthDayHeader}>
+                <span className={styles.monthDayNumber}>{format(day, 'd')}</span>
+                <button className={styles.dayAddBtn} onClick={() => { setSelectedDay(day); setIsAddingService(true); }}>
+                  <Plus size={12} />
+                </button>
               </div>
-              
-              {/* Proactive warnings */}
-              {services?.filter(s => s.startTime >= startDate && s.startTime <= endDate).map(s => {
-                const filled = rotaEntries.filter(r => r.serviceId === s._id).length;
-                const isUnderstaffed = filled < 3; // Mock logic for "understaffed"
-                return isUnderstaffed ? (
-                  <div key={s._id} className={styles.auditWarning}>
-                    <p><strong>{s.name}</strong> is understaffed</p>
-                    <span>Only {filled} volunteers assigned</span>
+              {dayServices.map(s => {
+                const filled = rotaEntries?.filter(r => r.serviceId === s._id).length || 0;
+                const coverageClass = filled === 0 ? styles.serviceInfoEmpty : filled < 3 ? styles.serviceInfoPartial : styles.serviceInfoFull;
+                return (
+                  <div key={s._id} className={`${styles.monthServiceItem} ${coverageClass}`}>
+                    {s.name} ({filled})
                   </div>
-                ) : null;
+                );
               })}
-            </>
-          )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderYearView = () => {
+    const months = eachMonthOfInterval({ start: startOfYear(currentDate), end: endOfYear(currentDate) });
+    return (
+      <div className={styles.yearContainer}>
+        {months.map(month => {
+          const days = eachDayOfInterval({ start: startOfMonth(month), end: endOfMonth(month) });
+          return (
+            <div key={month.toString()} className={styles.miniMonth}>
+              <h3 className={styles.miniMonthTitle}>{format(month, 'MMMM')}</h3>
+              <div className={styles.miniGrid}>
+                {days.map(day => {
+                  const dayStat = coverageStats?.find(s => isSameDay(new Date(s.date), day));
+                  const status = dayStat?.status || '';
+                  return (
+                    <div 
+                      key={day.toString()} 
+                      className={`${styles.miniDay} ${status ? styles.hasService : ''} ${status ? styles[status] : ''}`}
+                      title={dayStat ? `${dayStat.filled} assigned` : ''}
+                    >
+                      {format(day, 'd')}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+        <div className={styles.legend}>
+          <div className={styles.legendItem}><div className={`${styles.swatch} ${styles.full}`} /> Full Coverage</div>
+          <div className={styles.legendItem}><div className={`${styles.swatch} ${styles.partial}`} /> Understaffed</div>
+          <div className={styles.legendItem}><div className={`${styles.swatch} ${styles.empty}`} /> No Volunteers</div>
         </div>
       </div>
+    );
+  };
 
-      {/* Service Creation Modal */}
+  return (
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <div className={styles.titleArea}>
+          <h1>Volunteer Rota</h1>
+          <div className={styles.viewSwitcher}>
+            {(['week', 'month', 'year'] as const).map(mode => (
+              <button 
+                key={mode} 
+                className={`${styles.viewBtn} ${viewMode === mode ? styles.active : ''}`}
+                onClick={() => setViewMode(mode)}
+              >
+                {mode.charAt(0).toUpperCase() + mode.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.headerActions}>
+          <div className={styles.nav}>
+            <button className={styles.navBtn} onClick={() => handleNav('prev')}><ChevronLeft size={20} /></button>
+            <span className={styles.currentRange}>
+              {viewMode === 'week' && `${format(startDate, 'MMM d')} - ${format(endDate, 'MMM d, yyyy')}`}
+              {viewMode === 'month' && format(currentDate, 'MMMM yyyy')}
+              {viewMode === 'year' && format(currentDate, 'yyyy')}
+            </span>
+            <button className={styles.navBtn} onClick={() => handleNav('next')}><ChevronRight size={20} /></button>
+          </div>
+          <button className={styles.addBtn} onClick={() => setIsAssigning(true)}>
+            <Plus size={18} /> Add Shift
+          </button>
+        </div>
+      </header>
+
+      <div className={styles.contentArea}>
+        <main>
+          {viewMode === 'week' && renderWeekView()}
+          {viewMode === 'month' && renderMonthView()}
+          {viewMode === 'year' && renderYearView()}
+        </main>
+
+        <aside className={styles.sidebar}>
+          <div className={styles.sidebarCard}>
+            <div className={styles.sidebarTitle}><AlertCircle size={18} /> Coverage Audit</div>
+            <div className={styles.auditItem}>
+              <span className={styles.auditLabel}>Weekly Statistics</span>
+              <span className={styles.auditValue}>{rotaEntries.length} positions filled</span>
+            </div>
+            {viewMode === 'week' && services?.filter(s => isSameDay(new Date(s.startTime), currentDate)).length === 0 && (
+              <div className={styles.auditWarning}>
+                <p>No services scheduled for this range.</p>
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
+
+      {/* Modals remain mostly the same but using updated classNames */}
       {isAddingService && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
-              <h2>Create Service for {selectedDay && format(selectedDay, 'MMM d')}</h2>
+              <h2>Schedule Service for {selectedDay && format(selectedDay, 'MMM d')}</h2>
               <button onClick={() => setIsAddingService(false)}><X size={20} /></button>
             </div>
             <form onSubmit={handleCreateService} className={styles.form}>
               <div className={styles.field}>
                 <label>Service Name</label>
-                <input 
-                  placeholder="e.g. Sunday Morning Service" 
-                  value={newService.name}
-                  onChange={e => setNewService({...newService, name: e.target.value})}
-                  required
-                />
+                <input placeholder="e.g. Sunday Morning" value={newService.name} onChange={e => setNewService({...newService, name: e.target.value})} required />
               </div>
               <div className={styles.field}>
                 <label>Start Time</label>
-                <input 
-                  type="time"
-                  value={newService.time}
-                  onChange={e => setNewService({...newService, time: e.target.value})}
-                  required
-                />
-              </div>
-              <div className={styles.field}>
-                <label>QR Code Type</label>
-                <div className={styles.radioGroup}>
-                  <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      value="Unique" 
-                      checked={newService.qrType === 'Unique'} 
-                      onChange={() => setNewService({...newService, qrType: 'Unique'})}
-                    />
-                    <span>Unique (Per Service)</span>
-                  </label>
-                  <label className={styles.radioLabel}>
-                    <input 
-                      type="radio" 
-                      value="Generic" 
-                      checked={newService.qrType === 'Generic'} 
-                      onChange={() => setNewService({...newService, qrType: 'Generic'})}
-                    />
-                    <span>Generic (Static)</span>
-                  </label>
-                </div>
+                <input type="time" value={newService.time} onChange={e => setNewService({...newService, time: e.target.value})} required />
               </div>
               <button type="submit" className={styles.submitBtn}>Create Service</button>
             </form>
@@ -277,7 +363,6 @@ export const Rota: React.FC = () => {
         </div>
       )}
 
-      {/* Assignment Modal */}
       {isAssigning && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
@@ -288,26 +373,16 @@ export const Rota: React.FC = () => {
             <form onSubmit={handleAssign} className={styles.form}>
               <div className={styles.field}>
                 <label>Service</label>
-                <select 
-                  value={newShift.serviceId}
-                  onChange={e => setNewShift({...newShift, serviceId: e.target.value})}
-                  required
-                >
+                <select value={newShift.serviceId} onChange={e => setNewShift({...newShift, serviceId: e.target.value})} required>
                   <option value="">Select Service</option>
                   {services?.map(s => (
-                    <option key={s._id} value={s._id}>
-                      {s.name} ({format(s.startTime, 'EEE, MMM d')})
-                    </option>
+                    <option key={s._id} value={s._id}>{s.name} ({format(s.startTime, 'MMM d')})</option>
                   ))}
                 </select>
               </div>
               <div className={styles.field}>
                 <label>Volunteer</label>
-                <select 
-                  value={newShift.userId}
-                  onChange={e => setNewShift({...newShift, userId: e.target.value})}
-                  required
-                >
+                <select value={newShift.userId} onChange={e => setNewShift({...newShift, userId: e.target.value})} required>
                   <option value="">Select User</option>
                   {allUsers?.map(u => (
                     <option key={u._id} value={u._id}>{u.name || u.email}</option>
@@ -316,11 +391,7 @@ export const Rota: React.FC = () => {
               </div>
               <div className={styles.field}>
                 <label>Unit</label>
-                <select 
-                  value={newShift.subunitId}
-                  onChange={e => setNewShift({...newShift, subunitId: e.target.value})}
-                  required
-                >
+                <select value={newShift.subunitId} onChange={e => setNewShift({...newShift, subunitId: e.target.value})} required>
                   <option value="">Select Unit</option>
                   {subunits?.map(sub => (
                     <option key={sub._id} value={sub._id}>{sub.name} ({sub.departmentName})</option>
@@ -328,13 +399,8 @@ export const Rota: React.FC = () => {
                 </select>
               </div>
               <div className={styles.field}>
-                <label>Role in Service</label>
-                <input 
-                  placeholder="e.g. Lead Vocals, Slide Operator" 
-                  value={newShift.role}
-                  onChange={e => setNewShift({...newShift, role: e.target.value})}
-                  required
-                />
+                <label>Role</label>
+                <input placeholder="e.g. Lead Vocals" value={newShift.role} onChange={e => setNewShift({...newShift, role: e.target.value})} required />
               </div>
               <button type="submit" className={styles.submitBtn}>Assign Positions</button>
             </form>

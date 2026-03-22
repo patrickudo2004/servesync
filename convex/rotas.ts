@@ -40,7 +40,7 @@ export const removeRotaEntry = mutation({
   },
 });
 
-export const getRotaForWeek = query({
+export const getRotaForRange = query({
   args: { 
     startDate: v.number(), // Timestamp of start of week
     endDate: v.number(),   // Timestamp of end of week
@@ -89,6 +89,49 @@ export const getRotaForWeek = query({
     }
 
     return results;
+  },
+});
+
+export const getCoverageStats = query({
+  args: { 
+    year: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) return [];
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) return [];
+
+    const startOfYear = new Date(args.year, 0, 1).getTime();
+    const endOfYear = new Date(args.year, 11, 31, 23, 59, 59, 999).getTime();
+
+    // 1. Get all services for the year
+    const services = await ctx.db
+      .query("services")
+      .withIndex("by_church", (q) => q.eq("churchId", user.churchId))
+      .filter((q) => q.and(
+        q.gte(q.field("startTime"), startOfYear),
+        q.lte(q.field("startTime"), endOfYear)
+      ))
+      .collect();
+
+    // 2. For each service, count rotas
+    const stats = await Promise.all(services.map(async (s) => {
+      const entries = await ctx.db
+        .query("rotas")
+        .withIndex("by_service", (q) => q.eq("serviceId", s._id))
+        .collect();
+      
+      return {
+        date: s.startTime,
+        serviceId: s._id,
+        filled: entries.length,
+        // Mock requirement: 3+ for full coverage for now
+        status: entries.length === 0 ? 'empty' : entries.length < 3 ? 'partial' : 'full'
+      };
+    }));
+
+    return stats;
   },
 });
 
