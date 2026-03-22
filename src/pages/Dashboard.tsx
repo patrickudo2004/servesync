@@ -5,6 +5,7 @@ import {
   Calendar as CalendarIcon, 
   CheckCircle,
   Clock,
+  AlertTriangle,
   ChevronRight,
   Settings as SettingsIcon,
   Building2,
