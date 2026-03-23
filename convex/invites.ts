@@ -51,6 +51,7 @@ export const bulkInvite = mutation({
   },
   handler: async (ctx, args) => {
     const user = await checkRole(ctx, ["SuperAdmin", "DepartmentHead"]);
+    if (!user.churchId) throw new Error("Inviter must belong to a church");
     
     for (const email of args.emails) {
       const token = Math.random().toString(36).substring(2, 15);

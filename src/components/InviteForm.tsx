@@ -36,8 +36,8 @@ export const InviteForm: React.FC<InviteFormProps> = ({ userRole, defaultDepartm
       await bulkInvite({
         emails,
         role,
-        departmentId: selectedDeptId as any,
-        subunitId: selectedSubunitId as any,
+        departmentId: selectedDeptId || undefined as any,
+        subunitId: selectedSubunitId || undefined as any,
       });
       setSuccess(true);
       setEmailsText('');
