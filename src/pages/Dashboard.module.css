@@ -168,7 +168,7 @@
 .statLabel {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .statValue {
@@ -238,7 +238,7 @@
 }
 
 .activityItem:hover {
-  background: #f3f4f6;
+  background: var(--bg-primary);
 }
 
 .activityIndicator {
@@ -261,7 +261,7 @@
 
 .activityMeta {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .activityAction {

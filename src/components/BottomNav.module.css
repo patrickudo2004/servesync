@@ -4,8 +4,8 @@
   left: 0;
   right: 0;
   height: 80px;
-  background-color: white;
-  border-top: 1px solid #e5e7eb;
+  background-color: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -20,7 +20,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   text-decoration: none;
   flex: 1;
   height: 100%;
@@ -55,11 +55,11 @@
 .actionItem .iconWrapper {
   width: 56px;
   height: 56px;
-  background-color: #111827;
-  color: white;
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  border: 4px solid white;
+  border: 4px solid var(--bg-primary);
 }
 
 .actionItem .label {

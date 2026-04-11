@@ -19,7 +19,7 @@
 }
 
 .header p {
-  color: #6b7280;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -68,7 +68,7 @@
 }
 
 .deptText {
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .statusBadge {
@@ -85,7 +85,7 @@
 .pending { background: #fff7ed; color: #c2410c; }
 .accepted { background: #f0fdf4; color: #15803d; }
 .revoked { background: #fef2f2; color: #b91c1c; }
-.expired { background: #f9fafb; color: #6b7280; }
+.expired { background: var(--bg-secondary); color: var(--text-secondary); }
 
 .actions {
   display: flex;
@@ -107,8 +107,8 @@
 }
 
 .iconBtn:hover {
-  background: #f9fafb;
-  color: #111827;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .iconBtn.danger:hover {

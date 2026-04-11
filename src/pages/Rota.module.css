@@ -78,7 +78,7 @@
 }
 
 .viewBtn.active {
-  background: white;
+  background: var(--card-bg);
   color: #8b5cf6;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
@@ -94,7 +94,7 @@
   height: 40px;
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  background: white;
+  background: var(--card-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -397,7 +397,7 @@
 }
 
 .monthDay.otherMonth {
-  background: #f9fafb;
+  background: var(--bg-secondary);
   opacity: 0.5;
 }
 
@@ -432,8 +432,8 @@
   font-size: 0.7rem;
   padding: 4px 8px;
   border-radius: 6px;
-  background: #ede9fe;
-  color: #7c3aed;
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -443,12 +443,12 @@
 }
 
 .monthServiceItem:hover {
-  border-color: #c4b5fd;
+  border-color: rgba(139, 92, 246, 0.3);
 }
 
-.serviceInfoFull { background: #dcfce7; color: #166534; }
-.serviceInfoPartial { background: #fef9c3; color: #854d0e; }
-.serviceInfoEmpty { background: #fee2e2; color: #991b1b; }
+.serviceInfoFull { background: rgba(22, 163, 74, 0.1); color: #22c55e; }
+.serviceInfoPartial { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+.serviceInfoEmpty { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
 
 /* --- YEAR HEATMAP --- */
 .yearContainer {

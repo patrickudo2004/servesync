@@ -111,7 +111,7 @@
 }
 
 .activeTab {
-  background: white;
+  background: var(--card-bg);
   color: #8b5cf6;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
@@ -322,9 +322,9 @@
   height: 120px;
   border-radius: 16px;
   overflow: hidden;
-  border: 4px solid white;
+  border: 4px solid var(--bg-primary);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  background: white;
+  background: var(--bg-primary);
 }
 
 .logoPreview img {

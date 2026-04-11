@@ -143,8 +143,8 @@
 
 .messageRole {
   font-size: 0.75rem;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
   padding: 2px 8px;
   border-radius: 4px;
 }
@@ -206,8 +206,8 @@
 }
 
 .iconBtn:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .sendBtn {
@@ -221,6 +221,7 @@
 }
 
 .sendBtn:disabled {
-  background: #e5e7eb;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   cursor: not-allowed;
 }
