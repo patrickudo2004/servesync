@@ -4,13 +4,27 @@
 
 .tabs {
   display: flex;
-  padding: 16px 24px 0 24px;
-  gap: 12px;
+  padding: 1rem 1rem 0 1rem;
+  gap: 8px;
   border-bottom: 1px solid var(--border-color);
   background: var(--card-bg);
   position: sticky;
   top: 0;
   z-index: 10;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 480px) {
+  .tabs {
+    padding: 0.75rem 0.75rem 0 0.75rem;
+  }
+  
+  .tab, .activeTab {
+    padding: 10px 12px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
 }
 
 .tab {

@@ -17,6 +17,18 @@
   gap: 1.5rem;
 }
 
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+  
+  .headerLeft {
+    gap: 1rem;
+  }
+}
+
 .titleGroup h1 {
   font-size: 1.75rem;
   font-weight: 800;
@@ -71,6 +83,19 @@
   width: fit-content;
 }
 
+@media (max-width: 768px) {
+  .tabs {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem;
+  }
+  
+  .tab {
+    white-space: nowrap;
+  }
+}
+
 .tab {
   display: flex;
   align-items: center;
@@ -93,7 +118,7 @@
 
 .panel {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 2rem;
 }
 
@@ -105,6 +130,13 @@
   padding: 2rem;
   border-radius: 24px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+@media (max-width: 1024px) {
+  .geofencePanel {
+    grid-template-columns: 1fr;
+    padding: 1.25rem;
+  }
 }
 
 .section {
@@ -171,6 +203,13 @@
   gap: 1.5rem;
 }
 
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
 .hint {
   font-size: 0.75rem;
   color: var(--text-secondary);
@@ -203,6 +242,12 @@
   border-radius: 20px;
   background: #eee;
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .mapContainer {
+    height: 350px;
+  }
 }
 
 .select {
