@@ -3,11 +3,12 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Organogram } from '../components/Organogram';
 import { AdminSettings } from '../components/AdminSettings';
-import { Users, Mail, Settings, Shield, Loader2, Plus, Trash2, UserCog, ChevronRight, Building2 } from 'lucide-react';
+import { BorrowRequestForm } from '../components/BorrowRequestForm';
+import { Users, Mail, Settings, Shield, Loader2, Plus, Trash2, UserCog, ChevronRight, Building2, Briefcase } from 'lucide-react';
 import styles from './AdminPage.module.css';
 
 export const AdminPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'hierarchy' | 'users' | 'settings'>('hierarchy');
+  const [activeTab, setActiveTab] = useState<'hierarchy' | 'users' | 'settings' | 'borrow'>('hierarchy');
   const activeUser = useQuery(api.users.me);
   const myChurch = useQuery(api.churches.getMyChurch);
   const organogramData = useQuery(api.churches.getOrganogram);
@@ -89,6 +90,7 @@ export const AdminPage: React.FC = () => {
         <div className={styles.tabSwitcher}>
           <button className={activeTab === 'hierarchy' ? styles.activeTab : ''} onClick={() => setActiveTab('hierarchy')}>Hierarchy</button>
           <button className={activeTab === 'users' ? styles.activeTab : ''} onClick={() => setActiveTab('users')}>Users</button>
+          <button className={activeTab === 'borrow' ? styles.activeTab : ''} onClick={() => setActiveTab('borrow')}>Borrow Teams</button>
           <button className={activeTab === 'settings' ? styles.activeTab : ''} onClick={() => setActiveTab('settings')}>Settings</button>
         </div>
       </header>
@@ -279,6 +281,18 @@ export const AdminPage: React.FC = () => {
                 <Loader2 className="animate-spin text-purple-600" />
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'borrow' && (
+          <div className={styles.tabPane}>
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <Briefcase size={20} />
+                <h2>Inter-Department Borrowing</h2>
+              </div>
+              <BorrowRequestForm />
+            </section>
           </div>
         )}
       </div>

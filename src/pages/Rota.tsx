@@ -11,8 +11,10 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingDown,
+  TrendingDown,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  ClipboardList
 } from 'lucide-react';
 import { 
   format, 
@@ -77,6 +79,8 @@ export const Rota: React.FC = () => {
   // State
   const [isAssigning, setIsAssigning] = useState(false);
   const [isAddingService, setIsAddingService] = useState(false);
+  const [isLoggingKpi, setIsLoggingKpi] = useState<any>(null); // holds the entry
+  const [kpiForm, setKpiForm] = useState({ score: 'Good', note: '' });
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
   const [newShift, setNewShift] = useState({
@@ -151,6 +155,26 @@ export const Rota: React.FC = () => {
     }
   };
 
+  const logKPIForUser = useMutation(api.probation.logKPIForUser);
+
+  const handleLogKPI = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isLoggingKpi) return;
+    
+    try {
+      await logKPIForUser({
+        userId: isLoggingKpi.userId,
+        score: kpiForm.score as any,
+        note: kpiForm.note
+      });
+      alert("KPI Logging has been registered.");
+      setIsLoggingKpi(null);
+      setKpiForm({ score: 'Good', note: '' });
+    } catch (err: any) {
+      alert("Failed to log KPI: " + err.message);
+    }
+  };
+
   if (rotaEntries === undefined) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -185,7 +209,12 @@ export const Rota: React.FC = () => {
                       <div className={styles.cardHeader}>
                         <span className={styles.position}>{entry.position}</span>
                         <div className={styles.cardActions}>
-                          <button onClick={() => handleDelete(entry._id)} className={styles.deleteBtn}>
+                          {entry.userRole === "Probation" && (
+                            <button onClick={() => setIsLoggingKpi(entry)} className={styles.kpiBtn} title="Log KPI">
+                              <ClipboardList size={12} />
+                            </button>
+                          )}
+                          <button onClick={() => handleDelete(entry._id)} className={styles.deleteBtn} title="Remove Shift">
                             <Trash2 size={12} />
                           </button>
                         </div>
@@ -403,6 +432,39 @@ export const Rota: React.FC = () => {
                 <input placeholder="e.g. Lead Vocals" value={newShift.role} onChange={e => setNewShift({...newShift, role: e.target.value})} required />
               </div>
               <button type="submit" className={styles.submitBtn}>Assign Positions</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isLoggingKpi && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h2>Log Performance: {isLoggingKpi.userName}</h2>
+              <button onClick={() => setIsLoggingKpi(null)}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleLogKPI} className={styles.form}>
+              <div className={styles.field}>
+                <label>Punctuality & Execution</label>
+                <select value={kpiForm.score} onChange={e => setKpiForm({...kpiForm, score: e.target.value})} required>
+                  <option value="Excellent">Excellent</option>
+                  <option value="Good">Good</option>
+                  <option value="Needs Improvement">Needs Improvement</option>
+                  <option value="Disapprove">Disapprove</option>
+                </select>
+                <p className={styles.hint}>Note: Marking "Disapprove" will automatically extend their probation period.</p>
+              </div>
+              <div className={styles.field}>
+                <label>Leader's Note (Optional)</label>
+                <textarea 
+                  placeholder="Provide context for this score..."
+                  value={kpiForm.note}
+                  onChange={e => setKpiForm({...kpiForm, note: e.target.value})}
+                  rows={3}
+                />
+              </div>
+              <button type="submit" className={styles.submitBtn}>Save Log Entry</button>
             </form>
           </div>
         </div>

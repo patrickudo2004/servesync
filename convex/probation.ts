@@ -96,6 +96,31 @@ export const logKPI = mutation({
   },
 });
 
+export const logKPIForUser = mutation({
+  args: {
+    userId: v.id("users"),
+    score: v.union(v.literal("Excellent"), v.literal("Good"), v.literal("Needs Improvement"), v.literal("Disapprove")),
+    note: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const probationObj = await ctx.db
+      .query("probationPeriods")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .filter(q => q.or(q.eq(q.field("status"), "active"), q.eq(q.field("status"), "extended")))
+      .first();
+
+    if (!probationObj) {
+      throw new Error("No active probation period found for this user");
+    }
+
+    await logKPI.handler(ctx, {
+      probationId: probationObj._id,
+      score: args.score,
+      note: args.note,
+    });
+  }
+});
+
 export const getProbationReport = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {

@@ -269,6 +269,56 @@ export const getRecentActivities = query({
   },
 });
 
+export const getAttendanceTrends = query({
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) return [];
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) return [];
+
+    const churchId = user.churchId;
+    
+    const now = Date.now();
+    const services = await ctx.db
+      .query("services")
+      .withIndex("by_church", (q) => q.eq("churchId", churchId))
+      .filter((q) => q.lt(q.field("startTime"), now))
+      .order("desc")
+      .take(8);
+      
+    const trends = [];
+    
+    for (const service of services.reverse()) {
+      const attendance = await ctx.db
+        .query("attendance")
+        .withIndex("by_service", (q) => q.eq("serviceId", service._id))
+        .collect();
+        
+      let present = 0;
+      let late = 0;
+      let excused = 0;
+      
+      attendance.forEach(a => {
+        if (a.status === "Present") present++;
+        else if (a.status === "Late") late++;
+        else if (a.status === "Excused") excused++;
+      });
+      
+      const dateStr = new Date(service.startTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      trends.push({
+        date: dateStr,
+        name: service.name,
+        present,
+        late,
+        excused,
+        total: present + late + excused
+      });
+    }
+    
+    return trends;
+  }
+});
+
 export const getOrganogram = query({
   handler: async (ctx) => {
     const userId = await auth.getUserId(ctx);

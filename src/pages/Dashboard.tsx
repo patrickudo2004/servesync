@@ -19,6 +19,7 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
+  Legend,
   ResponsiveContainer,
   LineChart,
   Line
@@ -44,6 +45,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
   const stats = useQuery(api.churches.getChurchStats);
   const organogramData = useQuery(api.churches.getOrganogram);
   const activities = useQuery(api.churches.getRecentActivities);
+  const attendanceTrends = useQuery(api.churches.getAttendanceTrends);
   
   const ensureChannels = useMutation(api.chat.ensureChannels);
   const seedBadges = useMutation(api.recognition.seedBadges);
@@ -153,9 +155,39 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole }) => {
             <h2>Attendance Trends</h2>
           </div>
           <div className={styles.chartContainer}>
-            <div className="flex items-center justify-center h-[300px] text-gray-400 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-              No attendance records found for this church.
-            </div>
+            {attendanceTrends && attendanceTrends.length > 0 ? (
+              <div className="h-[300px] w-full mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={attendanceTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                    <XAxis 
+                      dataKey="date" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#6B7280', fontSize: 12 }}
+                      dy={10}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#6B7280', fontSize: 12 }}
+                    />
+                    <Tooltip 
+                      cursor={{ fill: 'rgba(139, 92, 246, 0.05)' }}
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
+                    />
+                    <Legend iconType="circle" wrapperStyle={{ paddingTop: '10px' }} />
+                    <Bar dataKey="present" name="Present" fill="#10B981" radius={[4, 4, 0, 0]} barSize={24} />
+                    <Bar dataKey="late" name="Late" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={24} />
+                    <Bar dataKey="excused" name="Excused" fill="#a78bfa" radius={[4, 4, 0, 0]} barSize={24} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-[300px] text-gray-400 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                No attendance records found for this church.
+              </div>
+            )}
           </div>
         </div>
 
