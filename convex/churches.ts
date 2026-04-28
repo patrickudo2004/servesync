@@ -270,57 +270,69 @@ export const getRecentActivities = query({
 });
 
 export const getAttendanceTrends = query({
-  handler: async (ctx) => {
-    const userId = await auth.getUserId(ctx);
-    if (!userId) return [];
-    const user = await ctx.db.get(userId);
-    if (!user?.churchId) return [];
+    try {
+      const userId = await auth.getUserId(ctx);
+      if (!userId) return [];
+      const user = await ctx.db.get(userId);
+      if (!user?.churchId) return [];
 
-    const churchId = user.churchId;
-    
-    const now = Date.now();
-    const services = await ctx.db
-      .query("services")
-      .withIndex("by_church_start_time", (q) => 
-        q.eq("churchId", churchId).lt("startTime", now)
-      )
-      .order("desc")
-      .take(8);
+      const churchId = user.churchId;
+      const now = Date.now();
       
-    const trends = [];
-    
-    for (const service of services.reverse()) {
-      const attendance = await ctx.db
-        .query("attendance")
-        .withIndex("by_service", (q) => q.eq("serviceId", service._id))
-        .collect();
+      const services = await ctx.db
+        .query("services")
+        .withIndex("by_church_start_time", (q) => 
+          q.eq("churchId", churchId).lt("startTime", now)
+        )
+        .order("desc")
+        .take(8);
         
-      let present = 0;
-      let late = 0;
-      let excused = 0;
-      
-      attendance.forEach(a => {
-        if (a.status === "Present") present++;
-        else if (a.status === "Late") late++;
-        else if (a.status === "Excused") excused++;
-      });
-      
-      const d = new Date(service.startTime);
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const dateStr = `${months[d.getMonth()]} ${d.getDate()}`;
+      if (!services || services.length === 0) return [];
 
-      trends.push({
-        date: dateStr,
-        name: service.name,
-        present,
-        late,
-        excused,
-        total: present + late + excused
-      });
+      // Sort chronological (oldest to newest for trend chart)
+      const sortedServices = [...services].sort((a, b) => a.startTime - b.startTime);
+      
+      const trends = [];
+      
+      for (const service of sortedServices) {
+        if (!service) continue;
+        
+        const attendance = await ctx.db
+          .query("attendance")
+          .withIndex("by_service", (q) => q.eq("serviceId", service._id))
+          .collect();
+          
+        let present = 0;
+        let late = 0;
+        let excused = 0;
+        
+        if (attendance) {
+          attendance.forEach(a => {
+            if (a.status === "Present") present++;
+            else if (a.status === "Late") late++;
+            else if (a.status === "Excused") excused++;
+          });
+        }
+        
+        const d = new Date(service.startTime);
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const dateStr = `${months[d.getMonth()]} ${d.getDate()}`;
+
+        trends.push({
+          date: dateStr,
+          name: service.name || "Unnamed Service",
+          present,
+          late,
+          excused,
+          total: present + late + excused
+        });
+      }
+      
+      return trends;
+    } catch (error) {
+      console.error("Error in getAttendanceTrends:", error);
+      throw error; // Re-throw to show as Server Error but with details in logs
     }
-    
-    return trends;
-  }
 });
 
 export const getOrganogram = query({
