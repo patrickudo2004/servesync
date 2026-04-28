@@ -270,6 +270,7 @@ export const getRecentActivities = query({
 });
 
 export const getAttendanceTrends = query({
+  handler: async (ctx) => {
     try {
       const userId = await auth.getUserId(ctx);
       if (!userId) return [];
@@ -333,6 +334,7 @@ export const getAttendanceTrends = query({
       console.error("Error in getAttendanceTrends:", error);
       throw error; // Re-throw to show as Server Error but with details in logs
     }
+  }
 });
 
 export const getOrganogram = query({
