@@ -74,7 +74,8 @@ export default defineSchema({
     endTime: v.number(),
     qrCodeSecret: v.optional(v.string()),
     qrType: v.optional(v.union(v.literal("Unique"), v.literal("Generic"))),
-  }).index("by_church", ["churchId"]),
+  }).index("by_church", ["churchId"])
+    .index("by_church_start_time", ["churchId", "startTime"]),
 
   departments: defineTable({
     churchId: v.id("churches"),

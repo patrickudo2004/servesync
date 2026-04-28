@@ -208,7 +208,7 @@ export const getChurchStats = query({
     // 2. Avg. Attendance (Last 5 services)
     const services = await ctx.db
       .query("services")
-      .withIndex("by_church", (q) => q.eq("churchId", churchId))
+      .withIndex("by_church_start_time", (q) => q.eq("churchId", churchId))
       .order("desc")
       .take(5);
     
@@ -281,8 +281,9 @@ export const getAttendanceTrends = query({
     const now = Date.now();
     const services = await ctx.db
       .query("services")
-      .withIndex("by_church", (q) => q.eq("churchId", churchId))
-      .filter((q) => q.lt(q.field("startTime"), now))
+      .withIndex("by_church_start_time", (q) => 
+        q.eq("churchId", churchId).lt("startTime", now)
+      )
       .order("desc")
       .take(8);
       
@@ -304,7 +305,10 @@ export const getAttendanceTrends = query({
         else if (a.status === "Excused") excused++;
       });
       
-      const dateStr = new Date(service.startTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      const d = new Date(service.startTime);
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const dateStr = `${months[d.getMonth()]} ${d.getDate()}`;
+
       trends.push({
         date: dateStr,
         name: service.name,

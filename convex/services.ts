@@ -12,7 +12,7 @@ export const getChurchServices = query({
 
     return await ctx.db
       .query("services")
-      .withIndex("by_church", (q) => q.eq("churchId", user.churchId!))
+      .withIndex("by_church_start_time", (q) => q.eq("churchId", user.churchId!))
       .order("desc")
       .collect();
   },
@@ -74,11 +74,11 @@ export const getDailyServices = query({
 
     return await ctx.db
       .query("services")
-      .withIndex("by_church", (q) => q.eq("churchId", user.churchId!))
-      .filter((q) => 
+      .withIndex("by_church_start_time", (q) => 
         q.and(
-          q.gte(q.field("startTime"), startOfDay),
-          q.lt(q.field("startTime"), endOfDay)
+          q.eq("churchId", user.churchId!),
+          q.gte("startTime", startOfDay),
+          q.lt("startTime", endOfDay)
         )
       )
       .collect();
