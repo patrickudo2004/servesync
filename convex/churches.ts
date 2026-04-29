@@ -169,6 +169,8 @@ export const updateExtendedSettings = mutation({
     geofenceRadius: v.optional(v.number()),
     requireLeadApprovalForSwaps: v.optional(v.boolean()),
     defaultQrType: v.optional(v.union(v.literal("Unique"), v.literal("Generic"))),
+    lat: v.optional(v.number()),
+    lng: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
@@ -181,10 +183,13 @@ export const updateExtendedSettings = mutation({
     const church = await ctx.db.get(user.churchId);
     if (!church) throw new Error("Church not found");
 
+    const { lat, lng, ...settings } = args;
+
     await ctx.db.patch(user.churchId, {
+      location: (lat !== undefined && lng !== undefined) ? { lat, lng } : church.location,
       settings: {
         ...(church.settings || {}),
-        ...args,
+        ...settings,
       },
     });
   },
