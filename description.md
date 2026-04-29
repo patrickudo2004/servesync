@@ -22,10 +22,13 @@ ServeSync is not just another rota app — it is the **digital nervous system** 
 ## Key Differentiators (What Makes ServeSync Unique)
 
 1. **Real Hierarchy That Matches Real Churches**  
-   Super Admin → Pastoral Oversight (new spiritual covering role) → Department Head → Subunit Lead → Volunteer
+   Super Admin → Deacon Head (Governing Board) → Pastoral Oversight → Department Head → Subunit Lead → Volunteer
 
-2. **Pastoral Oversight Role**  
-   A dedicated green-badge role above Department Heads with read-only visibility, escalation authority, and special “Oversight Messages” in chat.
+2. **Deacon Head Role (Governing Board)**  
+   A navy-blue badge role representing the church’s governing deacon board. One Deacon Head is assigned per department. They approve major escalations, have church-wide visibility, and communicate via a private Deacon Board channel — completely separate from system admin access.
+
+3. **Pastoral Oversight Role**  
+   A dedicated green-badge role above Department Heads with read-only visibility, escalation authority to the Deacon Board, and special “Oversight Messages” in chat.
 
 3. **Killer Attendance Feature**  
    Dynamic QR codes displayed on the projector or at the door. Volunteers scan with their phone. The app checks geofence (inside the church) and service time window. Updates appear live for every leader and Pastoral Oversight.
@@ -54,6 +57,7 @@ ServeSync is not just another rota app — it is the **digital nervous system** 
   - Volunteer: personal calendar + giant “Scan QR” button
   - Subunit Lead: live “Service Mode” showing who has arrived
   - Department Head / Pastoral Oversight: summary cards, probation watchlist, health metrics
+  - Deacon Head: department governance dashboard — escalation queue, KPI overview, private board chat
   - Super Admin: church-wide metrics and organogram
 - Mobile-first design (large touch targets, dark mode default, works perfectly on church WiFi)
 
@@ -83,8 +87,10 @@ ServeSync is not just another rota app — it is the **digital nervous system** 
 
 ### Real-Time Chat
 - Dedicated channels: Department, Subunit, Church-wide Announcements
+- **Private Deacon Board Channel**: Only accessible to users with the DeaconHead role. SuperAdmin does not have access unless they also hold DeaconHead. Designed for confidential governance discussion.
 - File uploads (photos, PDFs, service plans) with beautiful previews
 - Pastoral Oversight messages appear in green and can be pinned
+- Deacon Board messages appear in navy and are automatically pinned
 
 ### Volunteer Recognition & Motivation
 - Automatic badges for streaks, total hours, perfect attendance, special events
@@ -120,6 +126,9 @@ ServeSync is not just another rota app — it is the **digital nervous system** 
 
 **For Pastoral Oversight**  
 “I can see the spiritual health of my department, escalate issues quickly, and send encouragement messages that actually reach everyone.”
+
+**For Deacon Board Members (Deacon Head)**  
+“I have a private governance space, can approve escalations from pastoral oversight, and see the KPI health of my assigned department — all from my phone.”
 
 **For Senior Pastors (Super Admin)**  
 “I finally have real data on volunteer engagement across the entire church.”

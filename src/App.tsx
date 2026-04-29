@@ -32,6 +32,7 @@ import { VolunteerHome } from './pages/mobile/VolunteerHome';
 import { SubunitLeadHome } from './pages/mobile/SubunitLeadHome';
 import { DeptHeadHome } from './pages/mobile/DeptHeadHome';
 import { SuperAdminHome } from './pages/mobile/SuperAdminHome';
+import { DeaconHeadHome } from './pages/mobile/DeaconHeadHome';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 
@@ -66,6 +67,7 @@ function AppContent() {
   const getMobileHome = () => {
     switch (me?.role) {
       case 'SuperAdmin': return <SuperAdminHome />;
+      case 'DeaconHead': return <DeaconHeadHome />;
       case 'DepartmentHead': return <DeptHeadHome />;
       case 'SubunitLead': return <SubunitLeadHome />;
       default: return <VolunteerHome />;

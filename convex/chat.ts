@@ -22,6 +22,10 @@ export const getChannels = query({
 
     // Filter based on permissions
     return channels.filter((channel) => {
+      // Deacon Board channel: only DeaconHead can access (SuperAdmin excluded unless also DeaconHead)
+      if (channel.type === "deaconBoard") {
+        return user.role === "DeaconHead";
+      }
       if (channel.type === "announcement") return true;
       if (user.role === "SuperAdmin") return true;
       

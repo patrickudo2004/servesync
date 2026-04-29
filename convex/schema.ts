@@ -21,6 +21,7 @@ export default defineSchema({
       v.literal("DepartmentHead"),
       v.literal("DepartmentAssistant"),
       v.literal("PastoralOversight"),
+      v.literal("DeaconHead"),
       v.literal("Probation"),
       v.literal("OnNotice"),
       v.literal("SuperAdmin")
@@ -224,7 +225,7 @@ export default defineSchema({
 
   channels: defineTable({
     churchId: v.id("churches"),
-    type: v.union(v.literal("announcement"), v.literal("department"), v.literal("subunit")),
+    type: v.union(v.literal("announcement"), v.literal("department"), v.literal("subunit"), v.literal("deaconBoard")),
     departmentId: v.optional(v.id("departments")),
     subunitId: v.optional(v.id("subunits")),
     // Legacy fields

@@ -13,6 +13,7 @@ import type * as auth from "../auth.js";
 import type * as borrow from "../borrow.js";
 import type * as chat from "../chat.js";
 import type * as churches from "../churches.js";
+import type * as deaconBoard from "../deaconBoard.js";
 import type * as debug from "../debug.js";
 import type * as departments from "../departments.js";
 import type * as http from "../http.js";
@@ -41,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   borrow: typeof borrow;
   chat: typeof chat;
   churches: typeof churches;
+  deaconBoard: typeof deaconBoard;
   debug: typeof debug;
   departments: typeof departments;
   http: typeof http;

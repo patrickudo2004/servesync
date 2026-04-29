@@ -15,14 +15,15 @@
 ServeSync is a modern, mobile-first Progressive Web App (PWA) built specifically for churches. It provides a single, secure, real-time platform for managing volunteers across departments and subunits with the **exact hierarchy churches already use**.
 
 ### Key Differentiators
-- Real-time QR-code attendance with geofence verification (the “killer feature”)
-- Pastoral Oversight role with spiritual covering and escalation authority
+- Real-time QR-code attendance with geofence verification (the "killer feature")
+- Deacon Head role — governing board authority with private board channel and escalation approval
+- Pastoral Oversight role with spiritual covering and escalation authority to the Deacon Board
 - Volunteer recognition, streaks, and Hall of Fame to drive retention
 - Shift-swap marketplace and inter-department borrowing to eliminate last-minute chaos
 - Scoped real-time chat with file uploads (no more WhatsApp)
 - Strict role-based permissions and row-level security
 
-**Success Vision:** On any Sunday, a volunteer scans a QR → every leader and Pastoral Oversight sees the update instantly → rotas, probation, and morale are managed in one beautiful app.
+**Success Vision:** On any Sunday, a volunteer scans a QR → every leader and Pastoral Oversight sees the update instantly → Deacon Heads govern with real data → rotas, probation, and morale are managed in one beautiful app.
 
 ---
 
@@ -41,15 +42,17 @@ ServeSync is a modern, mobile-first Progressive Web App (PWA) built specifically
 | Role                  | Colour Hex       | Icon                      | Primary Responsibilities                                                                 | Dashboard Access          |
 |-----------------------|------------------|---------------------------|------------------------------------------------------------------------------------------|---------------------------|
 | Super Admin           | #8b5cf6 (Purple) | Crown                     | Church-wide oversight, create departments, final escalation, reports                     | Full church view          |
-| Pastoral Oversight    | #15803d (Deep Green) | Shepherd staff / cross    | Spiritual covering, read-only dept visibility, escalate issues, post Oversight messages  | Department + Oversight tab|
+| Deacon Head           | #1e3a5f (Deep Navy) | Scale                  | Governing board — approve escalations, assign PastoralOversight in dept, private board chat | Department + Church-wide  |
+| Pastoral Oversight    | #15803d (Deep Green) | Shepherd staff / cross | Spiritual covering, read-only dept visibility, escalate to Deacon Board, post Oversight messages | Department + Oversight tab|
 | Department Head       | #111827 (Black)  | Gold border               | Daily rota management, invite users, approve time-off/borrows, manage probation         | Full department           |
-| Subunit Lead          | #6b7280 (Slate Gray) | —                       | Mark attendance, create subunit rotas, log KPI for probation, offer swaps               | Subunit only              |
+| Subunit Lead          | #6b7280 (Slate Gray) | —                     | Mark attendance, create subunit rotas, log KPI for probation, offer swaps               | Subunit only              |
 | Volunteer             | #ef4444 (Red)    | —                         | View personal schedule, scan QR, request time-off/swap, view badges                     | Personal only             |
 | Probation             | #3b82f6 (Blue)   | Dashed border             | Same as Volunteer + visible KPI progress                                                 | Personal                  |
 | On Notice             | #f59e0b (Orange) | —                         | Monitored status                                                                         | Personal                  |
 | Borrowed              | Purple outline   | —                         | Temporary cross-dept assignment                                                          | Personal + target subunit |
 
-**Rule:** All badges appear on avatars, lists, organogram, chat messages, rotas, and profiles.
+**Rule:** All badges appear on avatars, lists, organogram, chat messages, rotas, and profiles.  
+**Hierarchy:** SuperAdmin → DeaconHead → PastoralOversight → DepartmentHead → SubunitLead → Volunteer
 
 ---
 
@@ -59,19 +62,29 @@ ServeSync is a modern, mobile-first Progressive Web App (PWA) built specifically
 - Google One-Tap + Email Magic Link only (no passwords ever)
 - Strict invite-only hierarchy:
   - Super Admin creates church
-  - Invites Pastoral Oversight
+  - Super Admin invites Deacon Heads (one per department)
+  - Deacon Heads / Super Admin invite Pastoral Oversight (within their dept)
   - Pastoral Oversight / Super Admin invite Dept Heads
   - Dept Heads invite Subunit Leads & Volunteers
 - Role elevation/promotion only by higher roles
 - Post-invite 3-step wizard: profile photo upload, phone number, availability calendar
 
-### 4.2 Pastoral Oversight Role (mandatory)
+### 4.2 Deacon Head Role (mandatory — added April 2026)
+- Multiple users may hold this role; each assigned to one department
+- Approve or reject escalations from Pastoral Oversight
+- Church-wide KPI and health visibility
+- Can assign PastoralOversight within their assigned department
+- Access to the private Deacon Board channel (SuperAdmin excluded unless also DeaconHead)
+- Deacon Board messages appear in navy blue and are automatically pinned
+- Dedicated governance dashboard: escalation queue, dept health, probation summary
+
+### 4.3 Pastoral Oversight Role (mandatory)
 - One per department
 - Full read-only access to entire department
 - Cannot edit rotas or mark attendance
-- Escalation buttons for probation, borrow disputes, major time-off
-- Special green “Oversight Messages” in chat (pinnable)
-- Dedicated “Oversight View” tab with department health score
+- Escalation buttons for probation, borrow disputes, major time-off (escalates to Deacon Board)
+- Special green "Oversight Messages" in chat (pinnable)
+- Dedicated "Oversight View" tab with department health score
 
 ### 4.3 Attendance System (Killer Feature)
 - Dynamic QR generated per service (display on projector/TV)
@@ -102,11 +115,13 @@ ServeSync is a modern, mobile-first Progressive Web App (PWA) built specifically
 - Formal inter-department borrow requests (Dept Head → Dept Head → Volunteer accept/decline)
 - Temporary “Borrowed” badge and auto-expiry
 
-### 4.8 Chat & Messaging
+### 4.9 Chat & Messaging
 - Channels: Department, Subunit, Church-wide Announcements
+- **Private Deacon Board Channel**: accessible only to DeaconHead role; SuperAdmin excluded unless also DeaconHead
 - Real-time with Convex subscriptions
 - File uploads (images, PDF, short video ≤50 MB) stored in Convex File Storage with previews
 - Pastoral Oversight messages appear in green with pin option
+- Deacon Board messages appear in navy blue and are automatically pinned
 
 ### 4.9 Volunteer Recognition & Streaks
 - Automatic badges: 3-month streak, Perfect Attendance 2025, 100 services, Total Hours, Easter Hero, etc.
@@ -125,6 +140,7 @@ ServeSync is a modern, mobile-first Progressive Web App (PWA) built specifically
   - Volunteer: personal calendar + big Scan QR button
   - Subunit Lead: live Service Mode list
   - Department Head / Oversight: summary cards + watchlists
+  - Deacon Head: escalation queue, department KPI summary, private board chat access
   - Super Admin: church-wide metrics
 - Large touch targets, pull-to-refresh, dark mode default
 
@@ -159,9 +175,9 @@ ServeSync is a modern, mobile-first Progressive Web App (PWA) built specifically
 
 ## 7. User Flows (high-level)
 
-1. Church creation → invite Pastoral Oversight → build department structure → invite volunteers
+1. Church creation → invite Deacon Heads → invite Pastoral Oversight → build department structure → invite volunteers
 2. Sunday flow: Leader generates QR → volunteers scan → live attendance + Service Mode
-3. Probation flow: Assign → leads log KPI → auto report → decide extend/end
+3. Probation flow: Assign → leads log KPI → auto report → decide extend/end → escalate to Deacon Head if needed
 4. Recognition flow: System auto-awards → confetti + Hall of Fame update
 
 ---
@@ -193,7 +209,8 @@ ServeSync is a modern, mobile-first Progressive Web App (PWA) built specifically
 **Phase 2:** Mobile Layout + Bottom Nav + Role-specific dashboards  
 **Phase 3:** Attendance QR + Rota + Shift Swap  
 **Phase 4:** Probation KPI + Borrowing + Chat + Recognition badges  
-**Phase 5:** Organogram + Polish + PWA + Testing + Deployment config
+**Phase 5:** Organogram + Polish + PWA + Testing + Deployment config  
+**Phase 6 (Apr 2026):** DeaconHead role — schema, permissions, private board channel, governance dashboard, role assignment guards
 
 ---
 

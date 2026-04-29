@@ -70,6 +70,7 @@ export const updateUserRole = mutation({
       v.literal("DepartmentAssistant"),
       v.literal("DepartmentHead"),
       v.literal("PastoralOversight"),
+      v.literal("DeaconHead"),
       v.literal("SuperAdmin")
     ),
     departmentId: v.optional(v.id("departments")),
@@ -79,7 +80,29 @@ export const updateUserRole = mutation({
     const adminId = await auth.getUserId(ctx);
     if (!adminId) throw new Error("Not authenticated");
     const admin = await ctx.db.get(adminId);
-    if (admin?.role !== "SuperAdmin") throw new Error("Only SuperAdmin can change roles");
+
+    const isSuperAdmin = admin?.role === "SuperAdmin";
+    const isDeaconHead = admin?.role === "DeaconHead";
+
+    if (!isSuperAdmin && !isDeaconHead) {
+      throw new Error("Only SuperAdmin or DeaconHead can change roles");
+    }
+
+    // DeaconHead can only assign PastoralOversight, and only within their own department
+    if (isDeaconHead) {
+      if (args.role !== "PastoralOversight") {
+        throw new Error("DeaconHead can only assign the PastoralOversight role");
+      }
+      const targetUser = await ctx.db.get(args.userId);
+      if (targetUser?.departmentId !== admin?.departmentId) {
+        throw new Error("DeaconHead can only assign roles within their own department");
+      }
+    }
+
+    // Only SuperAdmin can assign DeaconHead
+    if (args.role === "DeaconHead" && !isSuperAdmin) {
+      throw new Error("Only SuperAdmin can assign the DeaconHead role");
+    }
 
     const { userId, ...updates } = args;
     await ctx.db.patch(userId, updates);
