@@ -14,6 +14,7 @@ import {
   Trophy,
   ShoppingBag,
   Scale,
+  User,
 } from 'lucide-react';
 import { RoleBadge, UserRole } from './RoleBadge';
 import { ThemeToggle } from './ThemeToggle';
@@ -49,6 +50,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
     { label: 'Marketplace', icon: <ShoppingBag size={20} />, path: '/marketplace', roles: allRoles },
     { label: 'Hall of Fame', icon: <Trophy size={20} />, path: '/hall-of-fame', roles: allRoles },
     { label: 'Invites', icon: <Users size={20} />, path: '/invites', roles: ['SuperAdmin', 'DeaconHead', 'DepartmentHead'] },
+    { label: 'Profile', icon: <User size={20} />, path: '/profile', roles: allRoles },
   ];
 
   const filteredNav = navItems.filter(item => item.roles.includes(user.role));
@@ -85,16 +87,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
         </nav>
 
         <div className={styles.footer}>
-          <div className={styles.userInfo}>
+          <Link to="/profile" className={styles.userInfo}>
             <div className={styles.avatar}>{user.name[0]}</div>
             <div className={styles.userMeta}>
               <p className={styles.userName}>{user.name}</p>
-              <button className={styles.logoutBtn} onClick={() => signOut()}>
+              <button className={styles.logoutBtn} onClick={(e) => { e.preventDefault(); signOut(); }}>
                 <LogOut size={14} />
                 <span>Sign Out</span>
               </button>
             </div>
-          </div>
+          </Link>
         </div>
       </aside>
 
