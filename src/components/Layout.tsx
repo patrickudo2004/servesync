@@ -10,6 +10,10 @@ import {
   ChevronRight,
   Users,
   Shield,
+  MessageSquare,
+  Trophy,
+  ShoppingBag,
+  Scale,
 } from 'lucide-react';
 import { RoleBadge, UserRole } from './RoleBadge';
 import { ThemeToggle } from './ThemeToggle';
@@ -31,15 +35,20 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
   const navigate = useNavigate();
   const { signOut } = useAuthActions();
 
+  const allRoles = ['SuperAdmin', 'DeaconHead', 'PastoralOversight', 'DepartmentHead', 'SubunitLead', 'Volunteer', 'Probation', 'OnNotice'];
+
   const navItems = [
-    { label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer', 'Probation', 'OnNotice'] },
-    { label: 'Admin', icon: <Shield size={20} />, path: '/admin', roles: ['SuperAdmin'] },
+    { label: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/', roles: allRoles },
+    { label: 'Admin', icon: <Shield size={20} />, path: '/admin', roles: ['SuperAdmin', 'DeaconHead'] },
     { label: 'Church Settings', icon: <Settings size={20} />, path: '/admin/settings', roles: ['SuperAdmin'] },
-    { label: 'Services', icon: <Calendar size={20} />, path: '/services', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead'] },
-    { label: 'Attendance', icon: <UserCheck size={20} />, path: '/attendance', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer', 'Probation', 'OnNotice'] },
-    { label: 'Rota', icon: <Calendar size={20} />, path: '/rota', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer'] },
-    { label: 'Time Off', icon: <Clock size={20} />, path: '/time-off', roles: ['SuperAdmin', 'DepartmentHead', 'SubunitLead', 'Volunteer'] },
-    { label: 'Invites', icon: <Users size={20} />, path: '/invites', roles: ['SuperAdmin', 'DepartmentHead'] },
+    { label: 'Services', icon: <Calendar size={20} />, path: '/services', roles: ['SuperAdmin', 'DeaconHead', 'DepartmentHead', 'SubunitLead'] },
+    { label: 'Attendance', icon: <UserCheck size={20} />, path: '/attendance', roles: allRoles },
+    { label: 'Rota', icon: <Calendar size={20} />, path: '/rota', roles: ['SuperAdmin', 'DeaconHead', 'DepartmentHead', 'SubunitLead', 'Volunteer'] },
+    { label: 'Time Off', icon: <Clock size={20} />, path: '/time-off', roles: ['SuperAdmin', 'DeaconHead', 'DepartmentHead', 'SubunitLead', 'Volunteer'] },
+    { label: 'Chat', icon: <MessageSquare size={20} />, path: '/chat', roles: allRoles },
+    { label: 'Marketplace', icon: <ShoppingBag size={20} />, path: '/marketplace', roles: allRoles },
+    { label: 'Hall of Fame', icon: <Trophy size={20} />, path: '/hall-of-fame', roles: allRoles },
+    { label: 'Invites', icon: <Users size={20} />, path: '/invites', roles: ['SuperAdmin', 'DeaconHead', 'DepartmentHead'] },
   ];
 
   const filteredNav = navItems.filter(item => item.roles.includes(user.role));

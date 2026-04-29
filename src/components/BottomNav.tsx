@@ -29,7 +29,7 @@ interface NavItem {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ role }) => {
   const getNavItems = (): NavItem[] => {
-    if (role === 'SuperAdmin') {
+    if (role === 'SuperAdmin' || role === 'DeaconHead') {
       return [
         { icon: <BarChart3 size={24} />, label: 'Overview', path: '/' },
         { icon: <MessageSquare size={24} />, label: 'Chat', path: '/chat' },

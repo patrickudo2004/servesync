@@ -162,6 +162,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .field label {
@@ -181,11 +183,13 @@
 
 .inputWithUnit input {
   flex: 1;
+  min-width: 0;
   border: none;
   padding: 0.8rem 1rem;
   background: transparent;
   color: var(--text-primary);
   font-weight: 600;
+  box-sizing: border-box;
 }
 
 .inputWithUnit span {
@@ -195,6 +199,8 @@
   font-size: 0.875rem;
   font-weight: 600;
   border-left: 1px solid var(--border-color);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .row {

@@ -48,17 +48,30 @@ export const updateSubunit = mutation({
   args: {
     id: v.id("subunits"),
     name: v.optional(v.string()),
-    leadId: v.optional(v.id("users")),
-    assistantId: v.optional(v.id("users")),
+    leadId: v.optional(v.union(v.id("users"), v.literal(null))),
+    assistantId: v.optional(v.union(v.id("users"), v.literal(null))),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
     const user = await ctx.db.get(userId);
-    if (user?.role !== "SuperAdmin") throw new Error("Unauthorized");
+    
+    const subunit = await ctx.db.get(args.id);
+    if (!subunit) throw new Error("Subunit not found");
+
+    const isSuperAdmin = user?.role === "SuperAdmin";
+    const isMyDept = user?.role === "DeaconHead" && user.departmentId === subunit.departmentId;
+
+    if (!isSuperAdmin && !isMyDept) {
+      throw new Error("Unauthorized to update subunit");
+    }
 
     const { id, ...updates } = args;
-    await ctx.db.patch(id, updates);
+    const patchUpdates: any = { ...updates };
+    if (args.leadId === null) patchUpdates.leadId = undefined;
+    if (args.assistantId === null) patchUpdates.assistantId = undefined;
+    
+    await ctx.db.patch(id, patchUpdates);
   },
 });
 

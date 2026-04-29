@@ -57,14 +57,25 @@ export const deleteDepartment = mutation({
 export const updateDepartmentHeads = mutation({
   args: {
     id: v.id("departments"),
-    headId: v.optional(v.id("users")),
-    assistantId: v.optional(v.id("users")),
+    headId: v.optional(v.union(v.id("users"), v.literal(null))),
+    assistantId: v.optional(v.union(v.id("users"), v.literal(null))),
   },
   handler: async (ctx, args) => {
-    await checkAdmin(ctx);
-    await ctx.db.patch(args.id, {
-      headId: args.headId,
-      assistantId: args.assistantId,
-    });
+    const userId = await auth.getUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const user = await ctx.db.get(userId);
+    
+    const isSuperAdmin = user?.role === "SuperAdmin";
+    const isMyDept = user?.role === "DeaconHead" && user.departmentId === args.id;
+
+    if (!isSuperAdmin && !isMyDept) {
+      throw new Error("Unauthorized to update department heads");
+    }
+
+    const updates: any = {};
+    if (args.headId !== undefined) updates.headId = args.headId === null ? undefined : args.headId;
+    if (args.assistantId !== undefined) updates.assistantId = args.assistantId === null ? undefined : args.assistantId;
+
+    await ctx.db.patch(args.id, updates);
   },
 });

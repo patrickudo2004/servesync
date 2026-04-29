@@ -33,8 +33,8 @@ export const AdminPage: React.FC = () => {
   const handleRoleChange = async (userId: any, role: string) => {
     try {
       await updateUserRole({ userId, role: role as any });
-    } catch (err) {
-      alert("Failed to update user role. Only SuperAdmins can do this.");
+    } catch (err: any) {
+      alert(err.message || "Failed to update user role.");
     }
   };
 
@@ -102,9 +102,11 @@ export const AdminPage: React.FC = () => {
               <div className={styles.sectionHeader}>
                 <Building2 size={20} />
                 <h2>Departments</h2>
-                <button className={styles.addBtn} onClick={() => setIsAddingDept(true)}>
-                  <Plus size={16} /> Add Dept
-                </button>
+                {activeUser?.role === 'SuperAdmin' && (
+                  <button className={styles.addBtn} onClick={() => setIsAddingDept(true)}>
+                    <Plus size={16} /> Add Dept
+                  </button>
+                )}
               </div>
 
               {isAddingDept && (
@@ -124,7 +126,8 @@ export const AdminPage: React.FC = () => {
                         <label>Head:</label>
                         <select 
                           value={dept.headId || ''} 
-                          onChange={(e) => updateDeptHeads({ id: dept._id, headId: e.target.value as any })}
+                          onChange={(e) => updateDeptHeads({ id: dept._id, headId: e.target.value as any || null })}
+                          disabled={activeUser?.role === 'DeaconHead' && activeUser.departmentId !== dept._id}
                         >
                           <option value="">Unassigned</option>
                           {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
@@ -134,16 +137,19 @@ export const AdminPage: React.FC = () => {
                         <label>Assistant:</label>
                         <select 
                           value={dept.assistantId || ''} 
-                          onChange={(e) => updateDeptHeads({ id: dept._id, assistantId: e.target.value as any })}
+                          onChange={(e) => updateDeptHeads({ id: dept._id, assistantId: e.target.value as any || null })}
+                          disabled={activeUser?.role === 'DeaconHead' && activeUser.departmentId !== dept._id}
                         >
                           <option value="">Unassigned</option>
                           {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
                         </select>
                       </div>
                     </div>
-                    <button onClick={() => handleDeleteDept(dept._id)} className={styles.deleteBtn}>
-                      <Trash2 size={16} />
-                    </button>
+                    {activeUser?.role === 'SuperAdmin' && (
+                      <button onClick={() => handleDeleteDept(dept._id)} className={styles.deleteBtn}>
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -153,12 +159,14 @@ export const AdminPage: React.FC = () => {
               <div className={styles.sectionHeader}>
                 <Users size={20} />
                 <h2>Subunits</h2>
-                <button 
-                  className={styles.addBtn}
-                  onClick={() => setIsAddingSubunit(true)}
-                >
-                  <Plus size={16} /> Add Subunit
-                </button>
+                {activeUser?.role === 'SuperAdmin' && (
+                  <button 
+                    className={styles.addBtn}
+                    onClick={() => setIsAddingSubunit(true)}
+                  >
+                    <Plus size={16} /> Add Subunit
+                  </button>
+                )}
               </div>
 
               {isAddingSubunit && (
@@ -196,7 +204,8 @@ export const AdminPage: React.FC = () => {
                         <label>Lead:</label>
                         <select 
                           value={sub.leadId || ''} 
-                          onChange={(e) => updateSubunitMutation({ id: sub._id, leadId: e.target.value as any })}
+                          onChange={(e) => updateSubunitMutation({ id: sub._id, leadId: e.target.value as any || null })}
+                          disabled={activeUser?.role === 'DeaconHead' && activeUser.departmentId !== sub.departmentId}
                         >
                           <option value="">Unassigned</option>
                           {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
@@ -206,16 +215,19 @@ export const AdminPage: React.FC = () => {
                         <label>Assistant:</label>
                         <select 
                           value={sub.assistantId || ''} 
-                          onChange={(e) => updateSubunitMutation({ id: sub._id, assistantId: e.target.value as any })}
+                          onChange={(e) => updateSubunitMutation({ id: sub._id, assistantId: e.target.value as any || null })}
+                          disabled={activeUser?.role === 'DeaconHead' && activeUser.departmentId !== sub.departmentId}
                         >
                           <option value="">Unassigned</option>
                           {users.map(u => <option key={u._id} value={u._id}>{u.name || u.email}</option>)}
                         </select>
                       </div>
                     </div>
-                    <button onClick={() => deleteSubunit({ id: sub._id })} className={styles.deleteBtn}>
-                      <Trash2 size={16} />
-                    </button>
+                    {activeUser?.role === 'SuperAdmin' && (
+                      <button onClick={() => deleteSubunit({ id: sub._id })} className={styles.deleteBtn}>
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -249,6 +261,10 @@ export const AdminPage: React.FC = () => {
                             value={user.role || 'Volunteer'}
                             onChange={(e) => handleRoleChange(user._id, e.target.value)}
                             className={styles.roleSelect}
+                            disabled={
+                              activeUser?.role === 'DeaconHead' && 
+                              user.departmentId !== activeUser.departmentId
+                            }
                           >
                             <option value="Volunteer">Volunteer</option>
                             <option value="SubunitAssistant">Subunit Assistant</option>
@@ -256,6 +272,7 @@ export const AdminPage: React.FC = () => {
                             <option value="DepartmentAssistant">Dept. Assistant</option>
                             <option value="DepartmentHead">Department Head</option>
                             <option value="PastoralOversight">Pastoral Oversight</option>
+                            <option value="DeaconHead">Deacon Head</option>
                             <option value="SuperAdmin">Super Admin</option>
                           </select>
                         </td>
