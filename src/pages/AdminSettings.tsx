@@ -49,7 +49,8 @@ export const AdminSettings: React.FC = () => {
     burnoutLimitShiftsPerMonth: 8,
     swapDeadlineHours: 24,
     radiusUnit: 'meters' as 'meters' | 'miles',
-    accentColor: '#8b5cf6'
+    accentColor: '#8b5cf6',
+    name: ''
   });
 
   const mapRef = useRef<HTMLDivElement>(null);
@@ -70,7 +71,8 @@ export const AdminSettings: React.FC = () => {
         burnoutLimitShiftsPerMonth: church.settings?.burnoutLimitShiftsPerMonth ?? 8,
         swapDeadlineHours: church.settings?.swapDeadlineHours ?? 24,
         radiusUnit: church.settings?.radiusUnit ?? 'meters',
-        accentColor: church.settings?.accentColor ?? '#8b5cf6'
+        accentColor: church.settings?.accentColor ?? '#8b5cf6',
+        name: church.name ?? ''
       });
     }
   }, [church]);
@@ -222,6 +224,17 @@ export const AdminSettings: React.FC = () => {
             <section className={styles.section}>
               <h3><Palette size={20} /> Church Branding</h3>
               
+              <div className={styles.field}>
+                <label>Church Name</label>
+                <input 
+                  type="text" 
+                  value={formData.name} 
+                  onChange={e => setFormData({...formData, name: e.target.value})}
+                  placeholder="Enter church name"
+                  className={styles.textInput}
+                />
+              </div>
+
               <div className={styles.field}>
                 <label>Church Logo</label>
                 <div className={styles.logoUploadArea}>
