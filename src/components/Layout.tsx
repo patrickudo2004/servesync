@@ -7,14 +7,16 @@ import {
   Clock, 
   Settings, 
   LogOut,
+  Shield, 
+  MessageSquare, 
+  Trophy, 
+  ShoppingBag, 
+  Scale, 
+  User, 
+  ChevronLeft, 
   ChevronRight,
-  Users,
-  Shield,
-  MessageSquare,
-  Trophy,
-  ShoppingBag,
-  Scale,
-  User,
+  Menu,
+  Users
 } from 'lucide-react';
 import { RoleBadge, UserRole } from './RoleBadge';
 import { ThemeToggle } from './ThemeToggle';
@@ -35,6 +37,18 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuthActions();
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved === 'true';
+  });
+
+  const toggleSidebar = () => {
+    setIsCollapsed(prev => {
+      const newState = !prev;
+      localStorage.setItem('sidebarCollapsed', String(newState));
+      return newState;
+    });
+  };
 
   const allRoles = ['SuperAdmin', 'DeaconHead', 'PastoralOversight', 'DepartmentHead', 'SubunitLead', 'Volunteer', 'Probation', 'OnNotice'];
 
@@ -58,19 +72,24 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
   return (
     <div className={styles.container}>
       {/* Sidebar */}
-      <aside className={styles.sidebar}>
+      <aside className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ''}`}>
         <div className={styles.logo}>
           <div className={styles.logoIcon}>SS</div>
-          <span className={styles.logoText}>ServeSync</span>
+          {!isCollapsed && <span className={styles.logoText}>ServeSync</span>}
+          <button className={styles.collapseBtn} onClick={toggleSidebar}>
+            {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          </button>
         </div>
 
-        <div className={styles.churchInfo}>
-          <p className={styles.churchName}>{user.churchName}</p>
-          <div className="flex items-center justify-between">
-            <RoleBadge role={user.role} />
-            <ThemeToggle className={styles.themeToggle} />
+        {!isCollapsed && (
+          <div className={styles.churchInfo}>
+            <p className={styles.churchName}>{user.churchName}</p>
+            <div className="flex items-center justify-between">
+              <RoleBadge role={user.role} />
+              <ThemeToggle className={styles.themeToggle} />
+            </div>
           </div>
-        </div>
+        )}
 
         <nav className={styles.nav}>
           {filteredNav.map(item => (
@@ -78,10 +97,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
               key={item.path} 
               to={item.path} 
               className={`${styles.navItem} ${location.pathname === item.path ? styles.active : ''}`}
+              title={isCollapsed ? item.label : undefined}
             >
               {item.icon}
-              <span>{item.label}</span>
-              {location.pathname === item.path && <ChevronRight size={16} className={styles.activeIndicator} />}
+              {!isCollapsed && <span>{item.label}</span>}
+              {location.pathname === item.path && !isCollapsed && <ChevronRight size={16} className={styles.activeIndicator} />}
             </Link>
           ))}
         </nav>
@@ -89,13 +109,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, user }) => {
         <div className={styles.footer}>
           <Link to="/profile" className={styles.userInfo}>
             <div className={styles.avatar}>{user.name[0]}</div>
-            <div className={styles.userMeta}>
-              <p className={styles.userName}>{user.name}</p>
-              <button className={styles.logoutBtn} onClick={(e) => { e.preventDefault(); signOut(); }}>
-                <LogOut size={14} />
-                <span>Sign Out</span>
-              </button>
-            </div>
+            {!isCollapsed && (
+              <div className={styles.userMeta}>
+                <p className={styles.userName}>{user.name}</p>
+                <button className={styles.logoutBtn} onClick={(e) => { e.preventDefault(); signOut(); }}>
+                  <LogOut size={14} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
           </Link>
         </div>
       </aside>

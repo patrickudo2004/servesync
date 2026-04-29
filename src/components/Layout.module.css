@@ -11,6 +11,13 @@
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.collapsed {
+  width: 80px;
+  padding: 1.5rem 0.75rem;
 }
 
 .logo {
@@ -18,6 +25,11 @@
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 2rem;
+  position: relative;
+}
+
+.collapsed .logo {
+  justify-content: center;
 }
 
 .logoIcon {
@@ -31,6 +43,7 @@
   justify-content: center;
   font-weight: 800;
   font-size: 1.25rem;
+  flex-shrink: 0;
 }
 
 .logoText {
@@ -38,6 +51,39 @@
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.collapseBtn {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.collapsed .collapseBtn {
+  right: 50%;
+  transform: translate(50%, -50%);
+  top: 60px;
+}
+
+.collapseBtn:hover {
+  background: #8b5cf6;
+  color: white;
+  border-color: #8b5cf6;
 }
 
 .churchInfo {
@@ -45,6 +91,7 @@
   padding: 1rem;
   background: var(--bg-secondary);
   border-radius: 12px;
+  overflow: hidden;
 }
 
 .churchName {
@@ -52,6 +99,7 @@
   color: var(--text-secondary);
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
+  white-space: nowrap;
 }
 
 .themeToggle {
@@ -77,6 +125,23 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  overflow-y: auto;
+  margin: 0 -0.5rem;
+  padding: 0 0.5rem;
+}
+
+/* Custom scrollbar for sidebar nav */
+.nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
 }
 
 .navItem {
@@ -90,6 +155,12 @@
   font-weight: 500;
   transition: all 0.2s;
   position: relative;
+  white-space: nowrap;
+}
+
+.collapsed .navItem {
+  justify-content: center;
+  padding: 0.75rem;
 }
 
 .navItem:hover {
@@ -116,6 +187,11 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  text-decoration: none;
+}
+
+.collapsed .userInfo {
+  justify-content: center;
 }
 
 .avatar {
@@ -128,16 +204,21 @@
   justify-content: center;
   font-weight: 600;
   color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .userMeta {
   flex: 1;
+  overflow: hidden;
 }
 
 .userName {
   font-weight: 600;
   color: var(--text-primary);
   font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .logoutBtn {
