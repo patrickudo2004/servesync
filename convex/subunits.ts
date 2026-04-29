@@ -49,6 +49,7 @@ export const updateSubunit = mutation({
     id: v.id("subunits"),
     name: v.optional(v.string()),
     leadId: v.optional(v.id("users")),
+    assistantId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
     const userId = await auth.getUserId(ctx);

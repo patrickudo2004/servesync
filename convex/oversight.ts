@@ -79,13 +79,15 @@ export const escalateItem = mutation({
 
     // If it's probation, we might extend it automatically
     if (args.type === "probation") {
-      const probationId = args.itemId as any; // Cast for simplicity
-      const probation = await ctx.db.get(probationId);
-      if (probation) {
-        await ctx.db.patch(probationId, {
-          status: "extended",
-          endDate: probation.endDate + (30 * 24 * 60 * 60 * 1000), // Extend by 30 days
-        });
+      const probationId = ctx.db.normalizeId("probationPeriods", args.itemId);
+      if (probationId) {
+        const probation = await ctx.db.get(probationId);
+        if (probation) {
+          await ctx.db.patch(probationId, {
+            status: "extended",
+            endDate: probation.endDate + (30 * 24 * 60 * 60 * 1000), // Extend by 30 days
+          });
+        }
       }
     }
   },

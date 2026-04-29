@@ -23,7 +23,7 @@ export const DeptHeadHome: React.FC = () => {
   }
 
   // Filter subunits for this department
-  const mySubunits = subunits.filter(s => s.department === me.department);
+  const mySubunits = subunits.filter(s => s.departmentName === me.department);
 
   return (
     <div className={styles.page}>

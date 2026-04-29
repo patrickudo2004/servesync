@@ -227,7 +227,7 @@ export const ensureChannels = mutation({
 
     // 2. User's Department
     if (user.departmentId && !existing.find(c => c.type === "department" && c.departmentId === user.departmentId)) {
-      const dept = await ctx.db.get(user.departmentId);
+      const dept = await ctx.db.get(user.departmentId as import("./_generated/dataModel").Id<"departments">);
       await ctx.db.insert("channels", {
         churchId: args.churchId,
         type: "department",
@@ -239,7 +239,7 @@ export const ensureChannels = mutation({
 
     // 3. User's Subunit
     if (user.subunitId && !existing.find(c => c.type === "subunit" && c.subunitId === user.subunitId)) {
-      const sub = await ctx.db.get(user.subunitId);
+      const sub = await ctx.db.get(user.subunitId as import("./_generated/dataModel").Id<"subunits">);
       await ctx.db.insert("channels", {
         churchId: args.churchId,
         type: "subunit",

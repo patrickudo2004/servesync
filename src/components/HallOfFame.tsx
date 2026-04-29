@@ -15,7 +15,7 @@ export const HallOfFame: React.FC<HallOfFameProps> = ({ churchId }) => {
   const leaderboard = useQuery(api.recognition.getHallOfFame, { churchId, department: selectedDept });
 
   // Get unique departments from subunits
-  const departments = subunits ? Array.from(new Set(subunits.map(s => s.department))) : [];
+  const departments = subunits ? Array.from(new Set(subunits.map(s => s.departmentName))) : [];
 
   if (!leaderboard) return <div className={styles.loading}>Loading Hall of Fame...</div>;
 

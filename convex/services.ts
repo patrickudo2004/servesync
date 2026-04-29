@@ -75,12 +75,28 @@ export const getDailyServices = query({
     return await ctx.db
       .query("services")
       .withIndex("by_church_start_time", (q) => 
-        q.and(
-          q.eq("churchId", user.churchId!),
-          q.gte("startTime", startOfDay),
-          q.lt("startTime", endOfDay)
-        )
+        q.eq("churchId", user.churchId!).gte("startTime", startOfDay)
       )
+      .filter((q) => q.lt(q.field("startTime"), endOfDay))
       .collect();
+  },
+});
+
+export const getNextService = query({
+  handler: async (ctx) => {
+    const userId = await auth.getUserId(ctx);
+    if (!userId) return null;
+    const user = await ctx.db.get(userId);
+    if (!user?.churchId) return null;
+
+    const now = Date.now();
+    const service = await ctx.db
+      .query("services")
+      .withIndex("by_church_start_time", (q) => 
+        q.eq("churchId", user.churchId!).gte("startTime", now)
+      )
+      .first();
+
+    return service;
   },
 });

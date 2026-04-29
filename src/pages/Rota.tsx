@@ -11,7 +11,6 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingDown,
-  TrendingDown,
   CheckCircle2,
   AlertTriangle,
   ClipboardList

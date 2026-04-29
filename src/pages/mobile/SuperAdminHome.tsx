@@ -73,7 +73,7 @@ export const SuperAdminHome: React.FC = () => {
                 </div>
                 <div className={styles.itemInfo}>
                   <p className={styles.itemTitle}>{subunit.name}</p>
-                  <p className={styles.itemSubtitle}>{subunit.department}</p>
+                  <p className={styles.itemSubtitle}>{subunit.departmentName}</p>
                 </div>
                 <ChevronRight size={16} color="#9ca3af" />
               </div>

@@ -246,12 +246,26 @@ export const getChurchStats = query({
       .withIndex("by_church_status", (q) => q.eq("churchId", churchId).eq("status", "pending"))
       .collect();
 
+    // 5. Total Attendance Records
+    const attendanceRecords = await ctx.db
+      .query("attendance")
+      .withIndex("by_church", (q) => q.eq("churchId", churchId))
+      .collect();
+
+    // 6. Total Subunits
+    const subunits = await ctx.db
+      .query("subunits")
+      .withIndex("by_church", (q) => q.eq("churchId", churchId))
+      .collect();
+
     return {
       totalVolunteers: users.length,
       avgAttendance,
       upcomingServices: upcoming.length,
       pendingRequests: swaps.length + pendingInvites.length,
       nextService: upcoming[0] || null,
+      totalAttendanceRecords: attendanceRecords.length,
+      totalSubunits: subunits.length,
     };
   },
 });

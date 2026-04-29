@@ -47,6 +47,48 @@ export const startProbation = mutation({
   },
 });
 
+async function handleLogKPIInternal(ctx: any, args: { probationId: any, score: string, note?: string }) {
+  const currentUser = await getAuthenticatedUser(ctx);
+  if (currentUser.role !== "SubunitLead" && currentUser.role !== "DepartmentHead" && currentUser.role !== "SuperAdmin") {
+    throw new Error("Unauthorized to log KPI");
+  }
+
+  const probation = await ctx.db.get(args.probationId);
+  if (!probation || probation.status !== "active" && probation.status !== "extended") {
+    throw new Error("Active probation period not found");
+  }
+
+  await ctx.db.insert("kpiLogs", {
+    probationId: args.probationId,
+    userId: probation.userId,
+    loggerId: currentUser._id,
+    date: Date.now(),
+    score: args.score as any,
+    note: args.note,
+  });
+
+  // If Disapprove, automatically extend by 4 weeks
+  if (args.score === "Disapprove") {
+    const newEndDate = probation.endDate + 4 * 7 * 24 * 60 * 60 * 1000;
+    await ctx.db.patch(args.probationId, {
+      endDate: newEndDate,
+      status: "extended",
+    });
+    await ctx.db.patch(probation.userId, {
+      isExtendedProbation: true,
+    });
+
+    // Notify user
+    await ctx.db.insert("notifications", {
+      userId: probation.userId,
+      title: "Probation Extended",
+      message: "Your probation has been extended by 4 weeks due to a performance review.",
+      type: "probation_extended",
+      read: false,
+    });
+  }
+}
+
 export const logKPI = mutation({
   args: {
     probationId: v.id("probationPeriods"),
@@ -54,45 +96,7 @@ export const logKPI = mutation({
     note: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const currentUser = await getAuthenticatedUser(ctx);
-    if (currentUser.role !== "SubunitLead" && currentUser.role !== "DepartmentHead" && currentUser.role !== "SuperAdmin") {
-      throw new Error("Unauthorized to log KPI");
-    }
-
-    const probation = await ctx.db.get(args.probationId);
-    if (!probation || probation.status !== "active" && probation.status !== "extended") {
-      throw new Error("Active probation period not found");
-    }
-
-    await ctx.db.insert("kpiLogs", {
-      probationId: args.probationId,
-      userId: probation.userId,
-      loggerId: currentUser._id,
-      date: Date.now(),
-      score: args.score,
-      note: args.note,
-    });
-
-    // If Disapprove, automatically extend by 4 weeks
-    if (args.score === "Disapprove") {
-      const newEndDate = probation.endDate + 4 * 7 * 24 * 60 * 60 * 1000;
-      await ctx.db.patch(args.probationId, {
-        endDate: newEndDate,
-        status: "extended",
-      });
-      await ctx.db.patch(probation.userId, {
-        isExtendedProbation: true,
-      });
-
-      // Notify user
-      await ctx.db.insert("notifications", {
-        userId: probation.userId,
-        title: "Probation Extended",
-        message: "Your probation has been extended by 4 weeks due to a performance review.",
-        type: "probation_extended",
-        read: false,
-      });
-    }
+    await handleLogKPIInternal(ctx, args);
   },
 });
 
@@ -113,7 +117,7 @@ export const logKPIForUser = mutation({
       throw new Error("No active probation period found for this user");
     }
 
-    await logKPI.handler(ctx, {
+    await handleLogKPIInternal(ctx, {
       probationId: probationObj._id,
       score: args.score,
       note: args.note,
