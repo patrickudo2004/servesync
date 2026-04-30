@@ -138,6 +138,27 @@ export const AdminSettings: React.FC = () => {
     return unit === 'miles' ? val * 1609.34 : val;
   }
 
+  // Address Geocoding with debounce
+  useEffect(() => {
+    if (!formData.address || !window.google || activeTab !== 'geofence') return;
+    
+    const timeoutId = setTimeout(() => {
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({ address: formData.address }, (results: any, status: any) => {
+        if (status === 'OK' && results[0]) {
+          const location = results[0].geometry.location;
+          setFormData(prev => ({ 
+            ...prev, 
+            lat: location.lat(), 
+            lng: location.lng() 
+          }));
+        }
+      });
+    }, 1200); // 1.2s debounce to avoid excessive API calls
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.address, activeTab]);
+
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
