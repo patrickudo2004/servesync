@@ -160,6 +160,7 @@ export const updateSettings = mutation({
 export const updateExtendedSettings = mutation({
   args: {
     name: v.optional(v.string()),
+    address: v.optional(v.string()),
     lateThresholdMinutes: v.optional(v.number()),
     autoCheckoutHours: v.optional(v.number()),
     burnoutLimitShiftsPerMonth: v.optional(v.number()),
@@ -184,10 +185,11 @@ export const updateExtendedSettings = mutation({
     const church = await ctx.db.get(user.churchId);
     if (!church) throw new Error("Church not found");
 
-    const { name, lat, lng, ...settings } = args;
+    const { name, address, lat, lng, ...settings } = args;
 
     await ctx.db.patch(user.churchId, {
       name: name ?? church.name,
+      address: address ?? church.address,
       location: (lat !== undefined && lng !== undefined) ? { lat, lng } : church.location,
       settings: {
         ...(church.settings || {}),

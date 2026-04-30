@@ -50,7 +50,8 @@ export const AdminSettings: React.FC = () => {
     swapDeadlineHours: 24,
     radiusUnit: 'meters' as 'meters' | 'miles',
     accentColor: '#8b5cf6',
-    name: ''
+    name: '',
+    address: ''
   });
 
   const mapRef = useRef<HTMLDivElement>(null);
@@ -72,7 +73,8 @@ export const AdminSettings: React.FC = () => {
         swapDeadlineHours: church.settings?.swapDeadlineHours ?? 24,
         radiusUnit: church.settings?.radiusUnit ?? 'meters',
         accentColor: church.settings?.accentColor ?? '#8b5cf6',
-        name: church.name ?? ''
+        name: church.name ?? '',
+        address: church.address ?? ''
       });
     }
   }, [church]);
@@ -351,9 +353,38 @@ export const AdminSettings: React.FC = () => {
                   </div>
                 </div>
 
-                <div className={styles.coordinates}>
-                  <div>Lat: {formData.lat.toFixed(6)}</div>
-                  <div>Lng: {formData.lng.toFixed(6)}</div>
+                <div className={styles.field}>
+                  <label>Church Physical Address</label>
+                  <input 
+                    type="text" 
+                    value={formData.address} 
+                    onChange={e => setFormData({...formData, address: e.target.value})}
+                    placeholder="Enter physical address"
+                    className={styles.textInput}
+                  />
+                </div>
+
+                <div className={styles.row}>
+                  <div className={styles.field}>
+                    <label>Latitude</label>
+                    <input 
+                      type="number" 
+                      step="any"
+                      value={formData.lat} 
+                      onChange={e => setFormData({...formData, lat: parseFloat(e.target.value)})}
+                      className={styles.textInput}
+                    />
+                  </div>
+                  <div className={styles.field}>
+                    <label>Longitude</label>
+                    <input 
+                      type="number" 
+                      step="any"
+                      value={formData.lng} 
+                      onChange={e => setFormData({...formData, lng: parseFloat(e.target.value)})}
+                      className={styles.textInput}
+                    />
+                  </div>
                 </div>
 
                 <button 
