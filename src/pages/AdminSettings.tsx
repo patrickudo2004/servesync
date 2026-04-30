@@ -37,6 +37,8 @@ export const AdminSettings: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const addressInputRef = useRef<HTMLInputElement>(null);
+  const autocomplete = useRef<any>(null);
   
   const [formData, setFormData] = useState({
     attendanceWindowMinutes: 30,
@@ -131,6 +133,24 @@ export const AdminSettings: React.FC = () => {
           });
         });
       }
+
+      // Initialize Autocomplete
+      if (addressInputRef.current && !autocomplete.current) {
+        autocomplete.current = new window.google.maps.places.Autocomplete(addressInputRef.current, {
+          fields: ['formatted_address', 'geometry'],
+          types: ['address']
+        });
+
+        autocomplete.current.addListener('place_changed', () => {
+          const place = autocomplete.current.getPlace();
+          if (place.geometry && place.geometry.location) {
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+            const address = place.formatted_address;
+            setFormData(prev => ({ ...prev, lat, lng, address }));
+          }
+        });
+      }
     }
   }, [activeTab]);
 
@@ -147,27 +167,6 @@ export const AdminSettings: React.FC = () => {
   function getMetersFromRadius(val: number, unit: 'meters' | 'miles') {
     return unit === 'miles' ? val * 1609.34 : val;
   }
-
-  // Address Geocoding with debounce
-  useEffect(() => {
-    if (!formData.address || !window.google || activeTab !== 'geofence') return;
-    
-    const timeoutId = setTimeout(() => {
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ address: formData.address }, (results: any, status: any) => {
-        if (status === 'OK' && results[0]) {
-          const location = results[0].geometry.location;
-          setFormData(prev => ({ 
-            ...prev, 
-            lat: location.lat(), 
-            lng: location.lng() 
-          }));
-        }
-      });
-    }, 800); // 800ms debounce
-    
-    return () => clearTimeout(timeoutId);
-  }, [formData.address, activeTab]);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -388,9 +387,10 @@ export const AdminSettings: React.FC = () => {
                   <label>Church Physical Address</label>
                   <input 
                     type="text" 
+                    ref={addressInputRef}
                     value={formData.address} 
                     onChange={e => setFormData({...formData, address: e.target.value})}
-                    placeholder="Enter physical address"
+                    placeholder="Search or enter physical address"
                     className={styles.textInput}
                   />
                 </div>
