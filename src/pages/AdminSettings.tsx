@@ -118,7 +118,17 @@ export const AdminSettings: React.FC = () => {
 
         window.google.maps.event.addListener(marker.current, 'dragend', () => {
           const pos = marker.current.getPosition();
-          setFormData(prev => ({ ...prev, lat: pos.lat(), lng: pos.lng() }));
+          const lat = pos.lat();
+          const lng = pos.lng();
+          setFormData(prev => ({ ...prev, lat, lng }));
+          
+          // Reverse geocode to update address field
+          const geocoder = new window.google.maps.Geocoder();
+          geocoder.geocode({ location: { lat, lng } }, (results: any, status: any) => {
+            if (status === 'OK' && results[0]) {
+              setFormData(prev => ({ ...prev, address: results[0].formatted_address }));
+            }
+          });
         });
       }
     }
@@ -130,7 +140,7 @@ export const AdminSettings: React.FC = () => {
       marker.current.setPosition(newPos);
       circle.current.setCenter(newPos);
       circle.current.setRadius(getMetersFromRadius(formData.geofenceRadius, formData.radiusUnit));
-      googleMap.current.panTo(newPos);
+      googleMap.current.setCenter(newPos);
     }
   }, [formData.lat, formData.lng, formData.geofenceRadius, formData.radiusUnit]);
 
@@ -154,8 +164,8 @@ export const AdminSettings: React.FC = () => {
           }));
         }
       });
-    }, 1200); // 1.2s debounce to avoid excessive API calls
-
+    }, 800); // 800ms debounce
+    
     return () => clearTimeout(timeoutId);
   }, [formData.address, activeTab]);
 
